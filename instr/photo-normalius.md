@@ -76,12 +76,10 @@ Suggested attribution
 Climacium dendroides (Hedw.) F. Weber & D. Mohr observed in Canada by Randal (licensed under CC0 1.0)
 
 Taxiphyllum barbieri
-https://upload.wikimedia.org/wikipedia/commons/a/a5/Javamoos.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original
-(Attribution): Фото: Buchling / Wikimedia Commons (CC BY-SA 3.0)
+img/Taxiphyllum_barbieri.webp
 
 Vesicularia montagnei
-https://ru.wikipedia.org/wiki/Рождественский_мох?ysclid=mwcjk58zn2143268554#/media/Файл:Christmas_moss_and_riccia_(14441185564).jpg
-(Attribution): Фото: Storm (Ursus sapien) / Flickr / Wikimedia Commons (CC BY-SA 2.0)
+img/Vesicularia_montagnei.webp
 
 Mnium
 Identifier
@@ -726,20 +724,7 @@ Suggested attribution
 Marcgravia rectiflora Triana & Planch. observed in Puerto Rico by Al Kordesch (licensed under CC0 1.0)
 
 Monstera obliqua, M. adansonii mini
-Identifier
-https://inaturalist-open-data.s3.amazonaws.com/photos/632481721/original.jpg
-Creator
-Dan Fitzgerald (Fitz)
-Publisher
-iNaturalist
-Rights holder
-Dan Fitzgerald (Fitz)
-Record licence
-CC0 1.0
-Created
-2026-03-07T06:58:40-08:00
-Suggested attribution
-Monstera dubia (Kunth) Engl. & K.Krause observed in Panama by Dan Fitzgerald (Fitz) (licensed under CC0 1.0)
+img/Monstera_obliqua.webp
 
 Hedera helix
 Identifier
