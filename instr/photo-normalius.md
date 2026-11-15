@@ -470,7 +470,7 @@ Spathiphyllum wallisii Regel observed in Costa Rica by Martin Genner (licensed u
 
 Aglaonema
 Identifier
-https://inaturali...880/original.jpeg
+[https://inaturali...880/original.jpeg](https://inaturalist-open-data.s3.amazonaws.com/photos/65602880/original.jpeg)
 Creator
 Bruno Senterre
 Publisher
