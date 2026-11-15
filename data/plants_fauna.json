@@ -4,7 +4,7 @@
     "file": "data/plants_fauna.json",
     "purpose": "Каталог растений и беспозвоночных. Миграция с 1.2: машинные ключи, новые поля, фото-мета.",
     "locale": "name_ru/name_en/name_latin в карточке; notes → i18n notes.<id> на шаге 7",
-    "batch": "1/5 — мхи и папоротники (18 карточек)",
+    "batch": "complete — 73 растения + 15 беспозвоночных"
     "depends": ["criteria.json", "styles.json", "materials.json"],
     "pending_assets": "внешние фото (source_url) будут скачаны и сконвертированы в img/*.webp на этапе ассетов; image.file уже указывает целевой локальный путь",
     "data_fixes_applied": ["сфагнум/леукобриум/дикранум/кукушкин лён: +carnivore_acid и moss_acid — разблокирован биотоп росянка+сфагнум"]
@@ -898,6 +898,312 @@
       "styles": ["tropical_jungle"], "available": true,
       "image": { "file": "img/Medinilla_magnifica.webp", "photo_form": "wild_type", "license": "CC-BY-4.0", "author": "Addie", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/277604942/original.jpeg", "attribution": "Medinilla magnifica Lindl. observed in United States of America by Addie (licensed under CC BY 4.0)" }
     }
+    ,
+    {
+      "id": "plant_haworthia", "slug": "haworthia",
+      "name_ru": "Хавортия", "name_en": "Haworthia", "name_latin": "Haworthia",
+      "group": "succulents", "system_type": ["open"], "air_humidity": ["low"], "soil_humidity": ["dry"],
+      "substrate": ["succulent_mineral"], "light": ["sun", "bright_indirect"], "light_optimum": "bright_indirect",
+      "temperature": ["room"], "airflow": "high", "climate": "any", "habitat": ["ground"], "condensation": "no",
+      "growth_rate": "slow", "spread_mechanism": "none", "trim_interval_weeks": null,
+      "layer_form": ["carpet"], "size": "mini", "height_cm": 10,
+      "plant_toxicity": "safe", "care_level": "easy", "requires_grow_light": false,
+      "dormancy": "dry_winter", "wintering_months": [11, 12, 1, 2], "min_volume_closed_liters": 5, "min_volume_open_liters": 1,
+      "ph_tolerance": ["slightly_acid", "neutral", "alkaline"], "water_quality": "any", "monocarpic": false, "needs_day_night_drop": false,
+      "styles": ["minimal_modern"], "available": true,
+      "image": { "file": "img/Haworthia_pygmaea.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Di Turner", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/15221726/original.jpg", "attribution": null }
+    },
+    {
+      "id": "plant_gasteria", "slug": "gasteria",
+      "name_ru": "Гастерия", "name_en": "Gasteria", "name_latin": "Gasteria",
+      "group": "succulents", "system_type": ["open"], "air_humidity": ["low"], "soil_humidity": ["dry"],
+      "substrate": ["succulent_mineral"], "light": ["sun", "bright_indirect"], "light_optimum": "bright_indirect",
+      "temperature": ["room"], "airflow": "high", "climate": "any", "habitat": ["ground"], "condensation": "no",
+      "growth_rate": "slow", "spread_mechanism": "none", "trim_interval_weeks": null,
+      "layer_form": ["carpet"], "size": "mini", "height_cm": 12,
+      "plant_toxicity": "safe", "care_level": "easy", "requires_grow_light": false,
+      "dormancy": "dry_winter", "wintering_months": [11, 12, 1, 2], "min_volume_closed_liters": 5, "min_volume_open_liters": 1,
+      "ph_tolerance": ["slightly_acid", "neutral", "alkaline"], "water_quality": "any", "monocarpic": false, "needs_day_night_drop": false,
+      "styles": ["minimal_modern"], "available": true,
+      "image": { "file": "img/Gasteria_carinata.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Di Turner", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/15188920/original.jpg", "attribution": null }
+    },
+    {
+      "id": "plant_echeveria", "slug": "echeveria",
+      "name_ru": "Эхеверия", "name_en": "Echeveria", "name_latin": "Echeveria",
+      "group": "succulents", "system_type": ["open"], "air_humidity": ["low"], "soil_humidity": ["dry"],
+      "substrate": ["succulent_mineral"], "light": ["sun"], "light_optimum": "sun",
+      "temperature": ["room"], "airflow": "high", "climate": "any", "habitat": ["ground"], "condensation": "no",
+      "growth_rate": "slow", "spread_mechanism": "none", "trim_interval_weeks": null,
+      "layer_form": ["carpet"], "size": "mini", "height_cm": 10,
+      "plant_toxicity": "safe", "care_level": "medium", "requires_grow_light": true,
+      "dormancy": "dry_winter", "wintering_months": [11, 12, 1, 2], "min_volume_closed_liters": 5, "min_volume_open_liters": 1,
+      "ph_tolerance": ["slightly_acid", "neutral", "alkaline"], "water_quality": "any", "monocarpic": false, "needs_day_night_drop": false,
+      "styles": ["minimal_modern"], "available": true,
+      "image": { "file": "img/Echeveria_chihuahuaensis.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Sinaloa Silvestre", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/278833471/original.jpeg", "attribution": null }
+    },
+    {
+      "id": "plant_crassula", "slug": "crassula",
+      "name_ru": "Крассула / толстянка", "name_en": "Jade Plant (Crassula)", "name_latin": "Crassula",
+      "group": "succulents", "system_type": ["open"], "air_humidity": ["low"], "soil_humidity": ["dry"],
+      "substrate": ["succulent_mineral"], "light": ["sun"], "light_optimum": "sun",
+      "temperature": ["room"], "airflow": "high", "climate": "any", "habitat": ["ground"], "condensation": "no",
+      "growth_rate": "slow", "spread_mechanism": "none", "trim_interval_weeks": null,
+      "layer_form": ["bush"], "size": "mini", "height_cm": 15,
+      "plant_toxicity": "toxic_if_eaten", "care_level": "easy", "requires_grow_light": true,
+      "dormancy": "dry_winter", "wintering_months": [11, 12, 1, 2], "min_volume_closed_liters": 5, "min_volume_open_liters": 1,
+      "ph_tolerance": ["slightly_acid", "neutral", "alkaline"], "water_quality": "any", "monocarpic": false, "needs_day_night_drop": false,
+      "styles": ["minimal_modern", "ruins_postapo"], "available": true,
+      "image": { "file": "img/Crassula_alba.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Philip Precey", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/609034512/original.jpg", "attribution": null }
+    },
+    {
+      "id": "plant_sedum", "slug": "sedum",
+      "name_ru": "Седум / очиток", "name_en": "Stonecrop (Sedum)", "name_latin": "Sedum",
+      "group": "succulents", "system_type": ["open"], "air_humidity": ["low"], "soil_humidity": ["dry"],
+      "substrate": ["succulent_mineral"], "light": ["sun"], "light_optimum": "sun",
+      "temperature": ["room", "cool"], "airflow": "high", "climate": "any", "habitat": ["ground"], "condensation": "no",
+      "growth_rate": "aggressive", "spread_mechanism": "carpet", "trim_interval_weeks": 4,
+      "layer_form": ["carpet"], "size": "micro", "height_cm": 5,
+      "plant_toxicity": "safe", "care_level": "medium", "requires_grow_light": true,
+      "dormancy": "dry_winter", "wintering_months": [11, 12, 1, 2], "min_volume_closed_liters": 5, "min_volume_open_liters": 1,
+      "ph_tolerance": ["slightly_acid", "neutral", "alkaline"], "water_quality": "any", "monocarpic": false, "needs_day_night_drop": false,
+      "styles": ["minimal_modern", "ruins_postapo"], "available": true,
+      "image": { "file": "img/Sedum_acre.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Richard Fuller", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/605675011/original.jpg", "attribution": null }
+    },
+    {
+      "id": "plant_kalanchoe", "slug": "kalanchoe",
+      "name_ru": "Каланхоэ", "name_en": "Kalanchoe", "name_latin": "Kalanchoe",
+      "group": "succulents", "system_type": ["open"], "air_humidity": ["low"], "soil_humidity": ["dry"],
+      "substrate": ["succulent_mineral"], "light": ["sun"], "light_optimum": "sun",
+      "temperature": ["room"], "airflow": "high", "climate": "any", "habitat": ["ground"], "condensation": "no",
+      "growth_rate": "medium", "spread_mechanism": "none", "trim_interval_weeks": null,
+      "layer_form": ["bush"], "size": "mini", "height_cm": 15,
+      "plant_toxicity": "toxic_if_eaten", "care_level": "easy", "requires_grow_light": true,
+      "dormancy": "dry_winter", "wintering_months": [11, 12, 1, 2], "min_volume_closed_liters": 5, "min_volume_open_liters": 1,
+      "ph_tolerance": ["slightly_acid", "neutral", "alkaline"], "water_quality": "any", "monocarpic": false, "needs_day_night_drop": false,
+      "styles": ["minimal_modern"], "available": true,
+      "image": { "file": "img/Kalanchoe_daigremontiana.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Damien Wallace", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/610106848/original.jpg", "attribution": null }
+    },
+    {
+      "id": "plant_aloe_mini", "slug": "aloe",
+      "name_ru": "Алоэ мини", "name_en": "Aloe (dwarf)", "name_latin": "Aloe",
+      "group": "succulents", "system_type": ["open"], "air_humidity": ["low"], "soil_humidity": ["dry"],
+      "substrate": ["succulent_mineral"], "light": ["sun"], "light_optimum": "sun",
+      "temperature": ["room"], "airflow": "high", "climate": "any", "habitat": ["ground"], "condensation": "no",
+      "growth_rate": "slow", "spread_mechanism": "none", "trim_interval_weeks": null,
+      "layer_form": ["accent"], "size": "mini", "height_cm": 15,
+      "plant_toxicity": "toxic_if_eaten", "care_level": "easy", "requires_grow_light": true,
+      "dormancy": "dry_winter", "wintering_months": [11, 12, 1, 2], "min_volume_closed_liters": 5, "min_volume_open_liters": 1,
+      "ph_tolerance": ["slightly_acid", "neutral", "alkaline"], "water_quality": "any", "monocarpic": false, "needs_day_night_drop": false,
+      "styles": ["minimal_modern", "ruins_postapo"], "available": true,
+      "image": { "file": "img/Aloe_arborescens.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Quentin Groom", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/609453354/original.jpg", "attribution": null }
+    },
+    {
+      "id": "plant_rhipsalis", "slug": "rhipsalis",
+      "name_ru": "Рипсалис, лесной кактус", "name_en": "Mistletoe Cactus (Rhipsalis)", "name_latin": "Rhipsalis",
+      "group": "succulents", "system_type": ["semi", "closed"], "air_humidity": ["high", "mid"], "soil_humidity": ["moist"],
+      "substrate": ["epiphytic", "tropical"], "light": ["bright_indirect"], "light_optimum": "bright_indirect",
+      "temperature": ["room"], "airflow": "low", "climate": "tropical", "habitat": ["epiphyte"], "condensation": "yes",
+      "growth_rate": "medium", "spread_mechanism": "vine", "trim_interval_weeks": 6,
+      "layer_form": ["vine", "mount"], "size": "mini", "height_cm": 15,
+      "plant_toxicity": "safe", "care_level": "easy", "requires_grow_light": false,
+      "dormancy": "none", "wintering_months": null, "min_volume_closed_liters": 5, "min_volume_open_liters": 5,
+      "ph_tolerance": ["slightly_acid", "neutral"], "water_quality": "soft", "monocarpic": false, "needs_day_night_drop": false,
+      "styles": ["tropical_jungle", "minimal_modern"], "available": true,
+      "image": { "file": "img/Rhipsalis_elliptica.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Paula Romano", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/586126160/original.jpg", "attribution": null }
+    },
+    {
+      "id": "plant_hoya", "slug": "hoya",
+      "name_ru": "Хойя", "name_en": "Wax Plant (Hoya)", "name_latin": "Hoya carnosa, H. bella, H. kerrii, H. linearis",
+      "group": "succulents", "system_type": ["semi", "open"], "air_humidity": ["mid", "high"], "soil_humidity": ["moist"],
+      "substrate": ["epiphytic", "tropical"], "light": ["bright_indirect", "sun"], "light_optimum": "bright_indirect",
+      "temperature": ["room"], "airflow": "high", "climate": "tropical", "habitat": ["epiphyte"], "condensation": "no",
+      "growth_rate": "medium", "spread_mechanism": "vine", "trim_interval_weeks": 6,
+      "layer_form": ["vine", "mount"], "size": "mini", "height_cm": 15,
+      "plant_toxicity": "toxic_if_eaten", "care_level": "medium", "requires_grow_light": false,
+      "dormancy": "none", "wintering_months": null, "min_volume_closed_liters": 5, "min_volume_open_liters": 5,
+      "ph_tolerance": ["slightly_acid", "neutral"], "water_quality": "soft", "monocarpic": false, "needs_day_night_drop": false,
+      "styles": ["tropical_jungle", "minimal_modern"], "available": true,
+      "image": { "file": "img/Hoya_carnosa.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "葉子", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/362854168/original.jpeg", "attribution": null }
+    },
+    {
+      "id": "plant_ceropegia_woodii", "slug": "ceropegia",
+      "name_ru": "Церопегия Вуда", "name_en": "String of Hearts (Ceropegia woodii)", "name_latin": "Ceropegia woodii",
+      "group": "succulents", "system_type": ["open", "semi"], "air_humidity": ["low", "mid"], "soil_humidity": ["dry", "moist"],
+      "substrate": ["succulent_mineral", "tropical"], "light": ["sun", "bright_indirect"], "light_optimum": "bright_indirect",
+      "temperature": ["room"], "airflow": "high", "climate": "any", "habitat": ["ground"], "condensation": "no",
+      "growth_rate": "aggressive", "spread_mechanism": "vine", "trim_interval_weeks": 4,
+      "layer_form": ["vine"], "size": "mini", "height_cm": 10,
+      "plant_toxicity": "safe", "care_level": "easy", "requires_grow_light": false,
+      "dormancy": "dry_winter", "wintering_months": [11, 12, 1, 2], "min_volume_closed_liters": 5, "min_volume_open_liters": 1,
+      "ph_tolerance": ["slightly_acid", "neutral", "alkaline"], "water_quality": "any", "monocarpic": false, "needs_day_night_drop": false,
+      "styles": ["minimal_modern", "ruins_postapo"], "available": true,
+      "image": { "file": "img/Ceropegia_woodii.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Jimmy Whatmore", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/174082956/original.jpeg", "attribution": null }
+    },
+    {
+      "id": "plant_dischidia", "slug": "dischidia",
+      "name_ru": "Дисхидия", "name_en": "Dischidia", "name_latin": "Dischidia",
+      "group": "succulents", "system_type": ["semi", "closed"], "air_humidity": ["high", "mid"], "soil_humidity": ["moist"],
+      "substrate": ["epiphytic"], "light": ["bright_indirect"], "light_optimum": "bright_indirect",
+      "temperature": ["warm", "room"], "airflow": "low", "climate": "tropical", "habitat": ["epiphyte"], "condensation": "yes",
+      "growth_rate": "medium", "spread_mechanism": "vine", "trim_interval_weeks": 6,
+      "layer_form": ["vine", "mount"], "size": "mini", "height_cm": 10,
+      "plant_toxicity": "safe", "care_level": "easy", "requires_grow_light": false,
+      "dormancy": "none", "wintering_months": null, "min_volume_closed_liters": 5, "min_volume_open_liters": 5,
+      "ph_tolerance": ["slightly_acid", "neutral"], "water_quality": "soft", "monocarpic": false, "needs_day_night_drop": false,
+      "styles": ["tropical_jungle", "minimal_modern"], "available": true,
+      "image": { "file": "img/Dischidia_nummularia.webp", "photo_form": "wild_type", "license": "CC-BY-4.0", "author": "Cheryl Stinchcomb", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/611229794/original.jpg", "attribution": "Dischidia nummularia R.Br. observed in Thailand by Cheryl Stinchcomb (licensed under CC BY 4.0)" }
+    }
   ],
-  "fauna": []
+"fauna": [
+    {
+      "id": "fauna_collembola", "slug": "collembola",
+      "name_ru": "Коллемболы / ногохвостки", "name_en": "Springtails", "name_latin": "Collembola",
+      "group": "micro_cleanup", "system_type": ["closed", "semi", "open"], "air_humidity": ["high", "mid"], "soil_humidity": ["moist", "wet"],
+      "substrate": ["tropical", "epiphytic", "carnivore_acid", "moss_acid"], "light": ["shade", "bright_indirect"], "temperature": ["room", "warm"],
+      "role": ["cleanup"], "plant_interest": "none", "adult_size": "micro",
+      "feeding": "autonomous", "feeding_plan": null, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 1, "starter_count": { "min": 20, "recommended": 50 }, "needs_land_zone": false, "available": true,
+      "image": { "file": "img/Collembola.webp", "photo_form": "illustration", "license": "generated", "author": null, "source_url": null, "attribution": null }
+    },
+    {
+      "id": "fauna_trichorhina_tomentosa", "slug": "trichorhina",
+      "name_ru": "Карликовые белые тропические мокрицы", "name_en": "Dwarf White Isopods", "name_latin": "Trichorhina tomentosa",
+      "group": "micro_cleanup", "system_type": ["closed", "semi"], "air_humidity": ["high"], "soil_humidity": ["moist", "wet"],
+      "substrate": ["tropical", "epiphytic"], "light": ["shade", "bright_indirect"], "temperature": ["room", "warm"],
+      "role": ["cleanup"], "plant_interest": "none", "adult_size": "small",
+      "feeding": "autonomous", "feeding_plan": null, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 1, "starter_count": { "min": 10, "recommended": 20 }, "needs_land_zone": false, "available": true,
+      "image": { "file": "img/Trichorhina_tomentosa.webp", "photo_form": "wild_type", "license": "CC-BY-4.0", "author": "Alexis Tinker-Tsavalas", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/441598406/original.jpeg", "attribution": "Trichorhina tomentosa (Budde-Lund, 1893) observed in Germany by Alexis Tinker-Tsavalas (licensed under CC BY 4.0)" }
+    },
+    {
+      "id": "fauna_porcellionides_pruinosus_dwarf_purple", "slug": "pruinosus",
+      "name_ru": "Карликовые пурпурные мокрицы", "name_en": "Dwarf Purple Isopods", "name_latin": "Porcellionides pruinosus 'Dwarf Purple'",
+      "group": "micro_cleanup", "system_type": ["closed", "semi"], "air_humidity": ["high", "mid"], "soil_humidity": ["moist"],
+      "substrate": ["tropical", "epiphytic"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["cleanup"], "plant_interest": "nibbles", "adult_size": "small",
+      "feeding": "autonomous", "feeding_plan": null, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 1, "starter_count": { "min": 10, "recommended": 20 }, "needs_land_zone": false, "available": true,
+      "image": { "file": "img/Porcellionides_pruinosus.webp", "photo_form": "wild_type", "license": "CC-BY-4.0", "author": "Diego González Dopico", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/605400585/original.jpg", "attribution": "Porcellionides pruinosus (Brandt, 1833) observed in Spain by Diego González Dopico (licensed under CC BY 4.0)" }
+    },
+    {
+      "id": "fauna_hypoaspis_miles", "slug": "hypoaspis",
+      "name_ru": "Почвенные хищные клещи", "name_en": "Predatory Soil Mites", "name_latin": "Hypoaspis miles / Stratiolaelaps scimitus",
+      "group": "micro_cleanup", "system_type": ["closed", "semi"], "air_humidity": ["high", "mid"], "soil_humidity": ["moist"],
+      "substrate": ["tropical"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["predator"], "plant_interest": "none", "adult_size": "micro",
+      "feeding": "autonomous", "feeding_plan": null, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 1, "starter_count": { "min": 25, "recommended": 100 }, "needs_land_zone": false, "available": true,
+      "image": { "file": "img/Stratiolaelaps_scimitus.webp", "photo_form": "illustration", "license": "generated", "author": null, "source_url": null, "attribution": null }
+    },
+    {
+      "id": "fauna_porcellio_laevis_dairy_cow", "slug": "dairy-cow",
+      "name_ru": "Мокрица «Корова»", "name_en": "Dairy Cow Isopods", "name_latin": "Porcellio laevis 'Dairy Cow'",
+      "group": "isopods_show", "system_type": ["semi", "open"], "air_humidity": ["mid", "high"], "soil_humidity": ["moist"],
+      "substrate": ["tropical", "epiphytic"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["cleanup"], "plant_interest": "nibbles", "adult_size": "large",
+      "feeding": "needs_feeding", "feeding_plan": { "interval_days": 7, "items": ["leaf_litter", "vegetables", "cuttlebone"], "calcium_source": "cuttlebone" }, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 10, "starter_count": { "min": 6, "recommended": 10 }, "needs_land_zone": true, "available": true,
+      "image": { "file": "img/Porcellio_laevis.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Zoltán Stekkelpak", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/474209729/original.jpeg", "attribution": null }
+    },
+    {
+      "id": "fauna_armadillidium_maculatum", "slug": "zebra",
+      "name_ru": "Мокрица «Зебра»", "name_en": "Zebra Isopods", "name_latin": "Armadillidium maculatum",
+      "group": "isopods_show", "system_type": ["semi", "open"], "air_humidity": ["mid", "high"], "soil_humidity": ["moist"],
+      "substrate": ["tropical", "epiphytic"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["cleanup"], "plant_interest": "nibbles", "adult_size": "large",
+      "feeding": "needs_feeding", "feeding_plan": { "interval_days": 7, "items": ["leaf_litter", "vegetables", "cuttlebone"], "calcium_source": "cuttlebone" }, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 10, "starter_count": { "min": 6, "recommended": 10 }, "needs_land_zone": true, "available": true,
+      "image": { "file": "img/Armadillidium_maculatum.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Dan Fitzgerald (Fitz)", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/214784832/original.jpg", "attribution": null }
+    },
+    {
+      "id": "fauna_armadillidium_klugii", "slug": "clown",
+      "name_ru": "Мокрица «Клоун»", "name_en": "Clown Isopods", "name_latin": "Armadillidium klugii",
+      "group": "isopods_show", "system_type": ["semi", "open"], "air_humidity": ["mid", "high"], "soil_humidity": ["moist"],
+      "substrate": ["tropical", "epiphytic"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["cleanup"], "plant_interest": "nibbles", "adult_size": "large",
+      "feeding": "needs_feeding", "feeding_plan": { "interval_days": 7, "items": ["leaf_litter", "vegetables", "cuttlebone"], "calcium_source": "cuttlebone" }, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 10, "starter_count": { "min": 6, "recommended": 10 }, "needs_land_zone": true, "available": true,
+      "image": { "file": "img/Armadillidium_klugii.webp", "photo_form": "wild_type", "license": "CC-BY-4.0", "author": "Kirsten", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/515162725/original.jpg", "attribution": "Armadillidium klugii Brandt, 1833 observed in Bosnia and Herzegovina by Kirsten (licensed under CC BY 4.0)" }
+    },
+    {
+      "id": "fauna_cubaris_panda_king", "slug": "panda-king",
+      "name_ru": "Мокрица «Панда»", "name_en": "Panda King Isopods", "name_latin": "Cubaris sp. 'Panda King'",
+      "group": "isopods_show", "system_type": ["semi", "closed"], "air_humidity": ["high"], "soil_humidity": ["moist"],
+      "substrate": ["tropical", "epiphytic"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["cleanup"], "plant_interest": "nibbles", "adult_size": "large",
+      "feeding": "needs_feeding", "feeding_plan": { "interval_days": 7, "items": ["leaf_litter", "vegetables", "cuttlebone"], "calcium_source": "cuttlebone" }, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 10, "starter_count": { "min": 6, "recommended": 10 }, "needs_land_zone": true, "available": true,
+      "image": { "file": "img/Cubaris_sp_Panda_King.webp", "photo_form": "illustration", "license": "generated", "author": null, "source_url": null, "attribution": null }
+    },
+    {
+      "id": "fauna_cubaris_rubber_ducky", "slug": "rubber-ducky",
+      "name_ru": "Мокрица «Резиновый утёнок»", "name_en": "Rubber Ducky Isopods", "name_latin": "Cubaris sp. 'Rubber Ducky'",
+      "group": "isopods_show", "system_type": ["semi", "closed"], "air_humidity": ["high"], "soil_humidity": ["moist"],
+      "substrate": ["tropical", "epiphytic"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["cleanup"], "plant_interest": "nibbles", "adult_size": "large",
+      "feeding": "needs_feeding", "feeding_plan": { "interval_days": 7, "items": ["leaf_litter", "vegetables", "cuttlebone"], "calcium_source": "cuttlebone" }, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 10, "starter_count": { "min": 6, "recommended": 10 }, "needs_land_zone": true, "available": true,
+      "image": { "file": "img/Cubaris_sp_Rubber_Ducky.webp", "photo_form": "illustration", "license": "generated", "author": null, "source_url": null, "attribution": null }
+    },
+    {
+      "id": "fauna_porcellio_scaber_orange_powder_orange", "slug": "orange-isopods",
+      "name_ru": "Мокрица «Апельсин / Поросёнок»", "name_en": "Orange Isopods (Powder Orange)", "name_latin": "Porcellio scaber 'Orange' / Porcellionides pruinosus 'Powder Orange'",
+      "group": "isopods_show", "system_type": ["semi", "open"], "air_humidity": ["mid", "high"], "soil_humidity": ["moist"],
+      "substrate": ["tropical", "epiphytic"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["cleanup"], "plant_interest": "nibbles", "adult_size": "large",
+      "feeding": "needs_feeding", "feeding_plan": { "interval_days": 7, "items": ["leaf_litter", "vegetables", "cuttlebone"], "calcium_source": "cuttlebone" }, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 10, "starter_count": { "min": 8, "recommended": 15 }, "needs_land_zone": true, "available": true,
+      "image": { "file": "img/Porcellio_scaber_Orange.webp", "photo_form": "illustration", "license": "generated", "author": null, "source_url": null, "attribution": null }
+    },
+    {
+      "id": "fauna_armadillidium_vulgare", "slug": "vulgare",
+      "name_ru": "Обыкновенная мокрица-броненосец", "name_en": "Common Pill Bug", "name_latin": "Armadillidium vulgare",
+      "group": "isopods_show", "system_type": ["semi", "open"], "air_humidity": ["mid", "high"], "soil_humidity": ["moist"],
+      "substrate": ["tropical", "epiphytic"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["cleanup"], "plant_interest": "nibbles", "adult_size": "large",
+      "feeding": "needs_feeding", "feeding_plan": { "interval_days": 7, "items": ["leaf_litter", "vegetables", "cuttlebone"], "calcium_source": "cuttlebone" }, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 10, "starter_count": { "min": 6, "recommended": 10 }, "needs_land_zone": true, "available": true,
+      "image": { "file": "img/Armadillidium_vulgare.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Heather", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/618538167/original.jpg", "attribution": null }
+    },
+    {
+      "id": "fauna_millipedes", "slug": "millipedes",
+      "name_ru": "Двупарноногие многоножки / кивсяки, карликовые виды", "name_en": "Dwarf Millipedes", "name_latin": "Anadenobolus monilicornis 'Шмель', мелкие лесные виды",
+      "group": "other_inverts", "system_type": ["semi", "open"], "air_humidity": ["high", "mid"], "soil_humidity": ["moist", "wet"],
+      "substrate": ["tropical"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["cleanup", "digger"], "plant_interest": "nibbles", "adult_size": "large",
+      "feeding": "needs_feeding", "feeding_plan": { "interval_days": 7, "items": ["leaf_litter", "vegetables", "cuttlebone"], "calcium_source": "cuttlebone" }, "digging": "burrowing", "fauna_toxicity": "toxic_secret",
+      "min_volume_liters": 10, "starter_count": { "min": 3, "recommended": 6 }, "needs_land_zone": true, "available": true,
+      "image": { "file": "img/Anadenobolus_monilicornis.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Cat Logic", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/689815882/original.jpg", "attribution": null }
+    },
+    {
+      "id": "fauna_land_snails", "slug": "snails",
+      "name_ru": "Наземные улитки, мелкие виды", "name_en": "Small Land Snails", "name_latin": "Subulina octona, кустарниковые улитки",
+      "group": "other_inverts", "system_type": ["semi", "open"], "air_humidity": ["high"], "soil_humidity": ["moist", "wet"],
+      "substrate": ["tropical"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["pest"], "plant_interest": "eats_live", "adult_size": "small",
+      "feeding": "needs_feeding", "feeding_plan": { "interval_days": 5, "items": ["vegetables", "cuttlebone"], "calcium_source": "cuttlebone" }, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 10, "starter_count": null, "needs_land_zone": true, "available": true,
+      "image": { "file": "img/Subulina_octona.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "sunny tyson", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/431701023/original.jpeg", "attribution": null }
+    },
+    {
+      "id": "fauna_earthworms", "slug": "earthworms",
+      "name_ru": "Дождевые / калифорнийские черви", "name_en": "Earthworms / Compost Worms", "name_latin": "Lumbricidae / Eisenia fetida",
+      "group": "other_inverts", "system_type": ["open", "semi"], "air_humidity": ["high"], "soil_humidity": ["moist", "wet"],
+      "substrate": ["tropical"], "light": ["shade"], "temperature": ["room"],
+      "role": ["digger", "cleanup"], "plant_interest": "none", "adult_size": "large",
+      "feeding": "needs_feeding", "feeding_plan": { "interval_days": 14, "items": ["leaf_litter", "vegetables"], "calcium_source": null }, "digging": "burrowing", "fauna_toxicity": "safe",
+      "min_volume_liters": 20, "starter_count": null, "needs_land_zone": true, "available": false,
+      "image": { "file": "img/Eisenia_fetida.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Guerric Haché", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/475258877/original.jpeg", "attribution": null }
+    },
+    {
+      "id": "fauna_entomopathogenic_nematodes", "slug": "nematodes",
+      "name_ru": "Нематоды энтомопатогенные", "name_en": "Beneficial Nematodes", "name_latin": "Steinernema feltiae",
+      "group": "other_inverts", "system_type": ["closed", "semi"], "air_humidity": ["high", "mid"], "soil_humidity": ["moist", "wet"],
+      "substrate": ["tropical"], "light": ["shade", "bright_indirect"], "temperature": ["room"],
+      "role": ["predator"], "plant_interest": "none", "adult_size": "micro",
+      "feeding": "autonomous", "feeding_plan": null, "digging": "surface", "fauna_toxicity": "safe",
+      "min_volume_liters": 1, "starter_count": null, "needs_land_zone": false, "available": true,
+      "image": { "file": "img/Steinernema_feltiae.webp", "photo_form": "illustration", "license": "generated", "author": null, "source_url": null, "attribution": null }
+    }
+  ]
 }
