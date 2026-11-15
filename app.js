@@ -232,3 +232,11 @@ document.addEventListener('dragend',e=>{const r=e.target.closest('.sel-row');if(
 document.addEventListener('dragover',e=>{if(e.target.closest('.sel-row'))e.preventDefault();});
 document.addEventListener('drop',e=>{const r=e.target.closest('.sel-row');if(r&&dragIdx!=null){const to=+r.dataset.idx,it=state.items.splice(dragIdx,1)[0];state.items.splice(to,0,it);dragIdx=null;update();}});
 boot();
+
+// ── preview bridge (read-only) ──
+window.__fc = Object.freeze({
+  get state() { return state },
+  get D()     { return D     },
+  get DB()    { return DB    },
+  get t()     { return t     }
+});
