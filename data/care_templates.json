@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "file": "data/care_templates.json",
+    "purpose": "Генератор персональной шпаргалки ухода: блоки собираются по параметрам конкретной сборки.",
+    "locale": "Тексты — i18n care.<id>.text и care.section.<id>.title; переменные подставляются движком в {placeholder}.",
+    "depends": ["criteria.json", "norms.json", "materials.json", "vessels.json", "plants_fauna.json"],
+    "condition_vocabulary": {
+      "system_in": "system_type сборки входит в список",
+      "substrate_in": "выбранный субстрат входит в список",
+      "any_plant": "хотя бы одно растение имеет поле = значение",
+      "any_plant_flag": "хотя бы одно растение с булевым флагом = true",
+      "any_plant_habitat": "хотя бы одно растение с habitat, содержащим значение",
+      "any_fauna": "хотя бы одна фауна имеет поле = значение",
+      "any_fauna_role": "хотя бы одна фауна с ролью из списка",
+      "no_fauna_role": "нет фауны с ролью из списка",
+      "input_flag": "входной булев флаг = true",
+      "input_is": "входной параметр = значение (объект field/value)",
+      "light_corridor_has": "коридор света содержит уровень",
+      "stone_any": "хотя бы один камень имеет поле = значение",
+      "stone_prep_has": "хотя бы один камень имеет prep, содержащий ключ",
+      "decor_any": "хотя бы один декор имеет поле = значение",
+      "always": "блок выводится всегда"
+    },
+    "combination_rule": "несколько ключей в when = AND; блок попадает в выдачу, если when истинно",
+    "foreach_rule": "foreach: plants|fauna + filter генерирует по блоку на каждый подходящий объект; vars берутся из его карточки",
+    "generation_principles": {
+      "limiting_species": "полив — по самому чувствительному к переливу; свет — коридор + оптимумы; температура — самое узкое окно; влажность — пересечение",
+      "explainability": "каждый блок несёт source (правило/поле/вид) для показа «почему этот совет»",
+      "dedup": "в одной секции более специфичный блок (больше условий) вытесняет общий с тем же priority",
+      "order": "секции по order; внутри секции — по priority (меньше = выше)"
+    }
+  },
+  "sections": [
+    { "id": "startup", "order": 1, "title_key": "care.section.startup" },
+    { "id": "light", "order": 2, "title_key": "care.section.light" },
+    { "id": "watering", "order": 3, "title_key": "care.section.watering" },
+    { "id": "condensation", "order": 4, "title_key": "care.section.condensation" },
+    { "id": "ventilation", "order": 5, "title_key": "care.section.ventilation" },
+    { "id": "seasonal", "order": 6, "title_key": "care.section.seasonal" },
+    { "id": "pruning", "order": 7, "title_key": "care.section.pruning" },
+    { "id": "fauna", "order": 8, "title_key": "care.section.fauna" },
+    { "id": "water_quality", "order": 9, "title_key": "care.section.water_quality" },
+    { "id": "special", "order": 10, "title_key": "care.section.special" },
+    { "id": "bom", "order": 11, "title_key": "care.section.bom" }
+  ],
+  "templates": [
+    { "id": "care_startup_quarantine", "section": "startup", "priority": 1, "when": { "always": true }, "text_key": "care.startup_quarantine.text", "vars": [], "source": "best_practice" },
+    { "id": "care_startup_stone_test", "section": "startup", "priority": 2, "when": { "stone_any": { "ph_test_required": true } }, "text_key": "care.startup_stone_test.text", "vars": ["stone_names"], "source": "materials.stones[].ph_test_required" },
+    { "id": "care_startup_stone_soak", "section": "startup", "priority": 3, "when": { "stone_prep_has": "soak_3_5d" }, "text_key": "care.startup_stone_soak.text", "vars": ["stone_names", "days"], "source": "materials.stones[].prep" },
+    { "id": "care_startup_substrate_prep", "section": "startup", "priority": 4, "when": { "always": true }, "text_key": "care.startup_substrate_prep.text", "vars": ["components"], "source": "materials.components[].prep" },
+    { "id": "care_startup_cleanup_crew", "section": "startup", "priority": 5, "when": { "system_in": ["closed", "semi"], "no_fauna_role": ["cleanup"] }, "text_key": "care.startup_cleanup_crew.text", "vars": ["lead_time_weeks"], "source": "r_no_cleanup_crew" },
+    { "id": "care_startup_layers", "section": "startup", "priority": 6, "when": { "always": true }, "text_key": "care.startup_layers.text", "vars": ["layer_order"], "source": "materials.layer_order" },
+    { "id": "care_startup_calibration", "section": "startup", "priority": 7, "when": { "system_in": ["closed"] }, "text_key": "care.startup_calibration.text", "vars": ["dose_ml", "recheck_hours"], "source": "norms.water" },
+
+    { "id": "care_light_placement", "section": "light", "priority": 1, "when": { "always": true }, "text_key": "care.light_placement.text", "vars": ["placement_label"], "source": "norms.placement_map" },
+    { "id": "care_light_lamp_species", "section": "light", "priority": 2, "when": { "any_plant": { "requires_grow_light": true } }, "text_key": "care.light_lamp.text", "vars": ["species", "photoperiod_h", "distance_cm"], "source": "r_grow_light" },
+    { "id": "care_light_lamp_sun", "section": "light", "priority": 2, "when": { "light_corridor_has": "sun" }, "text_key": "care.light_lamp.text", "vars": ["species", "photoperiod_h", "distance_cm"], "source": "norms.light_norms" },
+    { "id": "care_light_no_direct_sun", "section": "light", "priority": 3, "when": { "system_in": ["closed"] }, "text_key": "care.light_no_direct_sun.text", "vars": [], "source": "r_closed_direct_sun" },
+    { "id": "care_light_winter_boost", "section": "light", "priority": 4, "when": { "always": true }, "text_key": "care.light_winter_boost.text", "vars": ["boost_h"], "source": "norms.light_norms.winter_boost_hours" },
+
+    { "id": "care_water_closed", "section": "watering", "priority": 1, "when": { "system_in": ["closed"] }, "text_key": "care.water_closed.text", "vars": [], "source": "norms.water" },
+    { "id": "care_water_open_tropical", "section": "watering", "priority": 2, "when": { "system_in": ["open", "semi"], "substrate_in": ["tropical", "epiphytic", "moss_acid"] }, "text_key": "care.water_open_tropical.text", "vars": ["interval_weeks"], "source": "norms.water" },
+    { "id": "care_water_open_succulent", "section": "watering", "priority": 2, "when": { "substrate_in": ["succulent_mineral"] }, "text_key": "care.water_open_succulent.text", "vars": ["interval_weeks"], "source": "norms.water" },
+    { "id": "care_water_carnivore_open", "section": "watering", "priority": 1, "when": { "substrate_in": ["carnivore_acid"], "system_in": ["open"] }, "text_key": "care.water_carnivore_open.text", "vars": ["tray_cm"], "source": "norms.water.carnivore_water_open" },
+    { "id": "care_water_carnivore_closed", "section": "watering", "priority": 1, "when": { "substrate_in": ["carnivore_acid"], "system_in": ["closed", "semi"] }, "text_key": "care.water_carnivore_closed.text", "vars": [], "source": "norms.water.carnivore_water_closed" },
+
+    { "id": "care_condensation_closed", "section": "condensation", "priority": 1, "when": { "system_in": ["closed"] }, "text_key": "care.condensation_closed.text", "vars": ["normal", "over_sign", "over_action", "under_sign", "under_action"], "source": "norms.condensation" },
+
+    { "id": "care_vent_closed", "section": "ventilation", "priority": 1, "when": { "system_in": ["closed"] }, "text_key": "care.vent_closed.text", "vars": ["schedule"], "source": "norms.ventilation" },
+    { "id": "care_vent_semi", "section": "ventilation", "priority": 1, "when": { "system_in": ["semi"] }, "text_key": "care.vent_semi.text", "vars": ["schedule"], "source": "norms.ventilation" },
+    { "id": "care_vent_mold", "section": "ventilation", "priority": 2, "when": { "system_in": ["closed", "semi"] }, "text_key": "care.vent_mold.text", "vars": [], "source": "norms.ventilation.mold_prevention" },
+
+    { "id": "care_season_cool_winter", "section": "seasonal", "priority": 1, "when": { "any_plant": { "dormancy": "cool_winter" } }, "text_key": "care.season_cool_winter.text", "vars": ["species", "months", "temp_c"], "source": "plants_fauna.plants[].dormancy" },
+    { "id": "care_season_dry_winter", "section": "seasonal", "priority": 1, "when": { "any_plant": { "dormancy": "dry_winter" } }, "text_key": "care.season_dry_winter.text", "vars": ["species", "months", "temp_c"], "source": "plants_fauna.plants[].dormancy" },
+    { "id": "care_season_summer", "section": "seasonal", "priority": 2, "when": { "always": true }, "text_key": "care.season_summer.text", "vars": [], "source": "norms.seasonal.summer_shading" },
+
+    { "id": "care_pruning_species", "section": "pruning", "priority": 1, "foreach": "plants", "filter": { "trim_interval_weeks_not_null": true }, "text_key": "care.prune_species.text", "vars": ["name", "interval_weeks", "mechanism"], "source": "plants_fauna.plants[].trim_interval_weeks" },
+    { "id": "care_pruning_aggressive", "section": "pruning", "priority": 2, "when": { "any_plant": { "growth_rate": "aggressive" } }, "text_key": "care.prune_aggressive.text", "vars": ["species"], "source": "r_growth_aggressive" },
+
+    { "id": "care_fauna_feeding", "section": "fauna", "priority": 1, "foreach": "fauna", "filter": { "feeding": "needs_feeding" }, "text_key": "care.fauna_feeding.text", "vars": ["name", "interval_days", "items"], "source": "plants_fauna.fauna[].feeding_plan" },
+    { "id": "care_fauna_calcium_local", "section": "fauna", "priority": 2, "when": { "any_fauna": { "feeding": "needs_feeding" }, "substrate_in": ["carnivore_acid", "moss_acid"] }, "text_key": "care.fauna_calcium_local.text", "vars": [], "source": "r_calcium_vs_acid" },
+    { "id": "care_fauna_litter", "section": "fauna", "priority": 3, "when": { "decor_any": { "is_feeding": true }, "any_fauna": { "feeding": "needs_feeding" } }, "text_key": "care.fauna_litter.text", "vars": ["refresh_weeks"], "source": "r_litter_feeding" },
+    { "id": "care_fauna_nematodes", "section": "fauna", "priority": 2, "when": { "any_fauna": { "slug": "nematodes" } }, "text_key": "care.fauna_nematodes.text", "vars": [], "source": "norms.fauna_defaults.nematode_dosing" },
+
+    { "id": "care_water_distilled", "section": "water_quality", "priority": 1, "when": { "any_plant": { "water_quality": "distilled_only" } }, "text_key": "care.water_distilled.text", "vars": ["species"], "source": "r_water_distilled_required" },
+    { "id": "care_water_soft", "section": "water_quality", "priority": 2, "when": { "any_plant": { "water_quality": "soft" }, "input_is": { "field": "water_type", "value": "tap_hard" } }, "text_key": "care.water_soft.text", "vars": ["species"], "source": "r_water_soft_recommended" },
+    { "id": "care_limescale", "section": "water_quality", "priority": 3, "when": { "input_is": { "field": "water_type", "value": "tap_hard" } }, "text_key": "care.limescale.text", "vars": [], "source": "diagnostics.white_dry_crust" },
+
+    { "id": "care_monocarpic", "section": "special", "priority": 1, "when": { "any_plant_flag": "monocarpic" }, "text_key": "care.monocarpic.text", "vars": ["species"], "source": "r_monocarpic" },
+    { "id": "care_day_night_drop", "section": "special", "priority": 1, "when": { "any_plant_flag": "needs_day_night_drop" }, "text_key": "care.day_night_drop.text", "vars": ["species"], "source": "r_day_night_drop" },
+    { "id": "care_epiphyte_mount", "section": "special", "priority": 2, "when": { "any_plant_habitat": "epiphyte" }, "text_key": "care.epiphyte_mount.text", "vars": ["species"], "source": "r_epiphyte_mount" },
+    { "id": "care_tillandsia", "section": "special", "priority": 1, "when": { "any_plant": { "slug": "tillandsia" } }, "text_key": "care.tillandsia.text", "vars": [], "source": "plants_fauna.plants[slug=tillandsia]" },
+    { "id": "care_bromeliad_cup", "section": "special", "priority": 2, "when": { "any_plant": { "group": "bromeliads" } }, "text_key": "care.bromeliad_cup.text", "vars": ["species"], "source": "best_practice" },
+
+    { "id": "care_bom_layers", "section": "bom", "priority": 1, "when": { "always": true }, "text_key": "care.bom_layers.text", "vars": ["drainage_l", "substrate_l", "charcoal_ml", "substrate_name"], "source": "norms.layers × derived.footprint" },
+    { "id": "care_bom_starter", "section": "bom", "priority": 2, "foreach": "fauna", "filter": { "starter_count_not_null": true }, "text_key": "care.bom_starter.text", "vars": ["name", "count_min", "count_recommended"], "source": "plants_fauna.fauna[].starter_count" },
+    { "id": "care_bom_lamp", "section": "bom", "priority": 3, "when": { "any_plant": { "requires_grow_light": true } }, "text_key": "care.bom_lamp.text", "vars": ["ppfd_range", "photoperiod_h"], "source": "norms.light_norms" }
+  ]
+}
