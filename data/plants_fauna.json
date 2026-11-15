@@ -447,8 +447,7 @@
       "dormancy": "none", "wintering_months": null, "min_volume_closed_liters": 5, "min_volume_open_liters": 5,
       "ph_tolerance": ["slightly_acid", "neutral"], "water_quality": "any", "monocarpic": false, "needs_day_night_drop": false,
       "styles": ["tropical_jungle", "minimal_modern"], "available": true,
-      "image": { "file": "img/Aglaonema_commutatum.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Bruno Senterre", "source_url": null, "attribution": null }
-    },
+      "image": { "file": "img/Aglaonema_commutatum.webp", "photo_form": "wild_type", "license": "CC0-1.0", "author": "Bruno Senterre", "source_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/149552880/original.jpeg", "attribution": null }    },
     {
       "id": "plant_calathea_maranta_ctenanthe", "slug": "calathea",
       "name_ru": "Калатея / маранта / ктенанта, карликовые виды", "name_en": "Prayer Plants (Calathea, Maranta, Ctenanthe)", "name_latin": "Calathea, Maranta, Ctenanthe",
