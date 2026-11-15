@@ -357,7 +357,7 @@
     "ph_corridor": "пересечение ph_tolerance всех растений ∩ ph_zones субстрата ∩ ph_zones камней ∩ ограничение water_type",
     "light_corridor": "пересечение light всех растений; оптимумы проверяются отдельно (r_light_optimum_mismatch)",
     "substrate_candidates": "глобальное пересечение substrate растений и фауны; если >1 — выбор по стилю/биотопу или пользователем",
-    "capacity_ratio": "Σ площадь_посадки(size) × (aggressive ? 1.5 : 1) / footprint_cm2; нормы площадей в norms.json",
+    "capacity_ratio": "бакетная модель по norms.planting: habit вычисляется из layer_form; для каждого бакета Σ пятно(size) × (aggressive ? 2 : 1) / (footprint × fill_factor бакета)",
     "limiting": "лимитирующие виды для генератора ухода: полив — по самому чувствительному к переливу; свет — коридор+оптимумы; температура — самое узкое окно; влажность — пересечение"
   },
 
