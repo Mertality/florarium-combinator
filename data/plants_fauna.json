@@ -4,7 +4,7 @@
     "file": "data/plants_fauna.json",
     "purpose": "Каталог растений и беспозвоночных. Миграция с 1.2: машинные ключи, новые поля, фото-мета.",
     "locale": "name_ru/name_en/name_latin в карточке; notes → i18n notes.<id> на шаге 7",
-    "batch": "complete — 73 растения + 15 беспозвоночных"
+    "batch": "complete — 73 растения + 15 беспозвоночных",
     "depends": ["criteria.json", "styles.json", "materials.json"],
     "pending_assets": "внешние фото (source_url) будут скачаны и сконвертированы в img/*.webp на этапе ассетов; image.file уже указывает целевой локальный путь",
     "data_fixes_applied": ["сфагнум/леукобриум/дикранум/кукушкин лён: +carnivore_acid и moss_acid — разблокирован биотоп росянка+сфагнум"]
