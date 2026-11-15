@@ -1,0 +1,998 @@
+{
+  "meta": {
+    "schema_version": "1.3",
+    "file": "data/criteria.json",
+    "purpose": "Контракт данных и правил комбинатора флорариумов. Каталог, стили, материалы, нормы, шаблоны ухода, диагностика — отдельные файлы.",
+    "locale_model": "Все значения — машинные ключи. Тексты UI — i18n/ru.json + i18n/en.json. Названия видов — в карточках (name_ru, name_en, name_latin).",
+    "messages": "Каждое правило обязано иметь строки rules.<id>.msg и rules.<id>.remedy в ОБОИХ словарях. Конфликты пересечений: conflict.<field>.msg.",
+    "key_format": "no_trailing_spaces; имена файлов без пробелов",
+    "changelog": [
+      "1.3: машинные ключи вместо русских строк (карты миграции — enums.*.migrate)",
+      "1.3: новые входы vessel/placement/water_type/experience/style + производные поля",
+      "1.3: pH-модель зон: растения + субстрат + камни + вода пересекаются единым механизмом",
+      "1.3: light остаётся массивом допусков, добавлен light_optimum; жёсткого запрета разных категорий света НЕТ",
+      "1.3: substrate расширен до 5 типов (добавлен moss_acid, эпифитный сохранён)",
+      "1.3: ИСПРАВЛЕН АЛГОРИТМ 1.2: layer_form, role, habitat_type убраны из пересечения — это описательные поля, а не требования к среде (пересечение по ним блокировало классические сборки: ковёр+куст+лиана, наземное+эпифит)",
+      "1.3: добавлено глобальное пересечение по всей сборке (попарное не гарантирует общего)",
+      "1.3: явный фильтр по system_type карточки (в 1.2 отсутствовал)",
+      "1.3: удалены legacy min_volume, min_volume_display, toxicity_for_fauna; notes → i18n",
+      "1.3: новые поля: slug, image, ph_tolerance, spread_mechanism, trim_interval_weeks, height_cm, styles, water_quality, monocarpic, needs_day_night_drop, wintering_months, available; фауна: starter_count, feeding_plan, needs_land_zone",
+      "1.3: 27 новых правил; у всех правил msg + remedy",
+      "1.3: outputs: saved_builds, share_url, ai_check (спека «промт для ии.md»), vessel_recommendation",
+      "1.3: черви available=false — вне настольного формата; потолок 15 л сохранён, класс «витрина» отложен"
+    ]
+  },
+
+  "enums": {
+    "system_type": {
+      "values": ["closed", "semi", "open"],
+      "migrate": {
+        "закрытая (герметичная)": "closed",
+        "полузакрытая (с проветриванием)": "semi",
+        "открытая": "open"
+      }
+    },
+    "air_humidity": {
+      "values": ["low", "mid", "high"],
+      "ranges_pct": { "low": [40, 60], "mid": [60, 80], "high": [85, 100] },
+      "migrate": {
+        "низкая (40–60%)": "low",
+        "умеренная (60–80%)": "mid",
+        "высокая (85–100%)": "high"
+      }
+    },
+    "soil_humidity": {
+      "values": ["dry", "moist", "wet"],
+      "migrate": {
+        "сухая (с полной просушкой)": "dry",
+        "умеренно влажная": "moist",
+        "постоянно мокрая / болотная": "wet"
+      }
+    },
+    "substrate": {
+      "values": [
+        "tropical",
+        "epiphytic",
+        "carnivore_acid",
+        "succulent_mineral",
+        "moss_acid"
+      ],
+      "migrate": {
+        "легкий торфяной (тропический)": "tropical",
+        "эпифитный (кора и сфагнум)": "epiphytic",
+        "кислый торф (для хищников)": "carnivore_acid",
+        "песчано-минеральный (для суккулентов)": "succulent_mineral"
+      },
+      "note": "moss_acid — новый тип; рецепты в materials.json"
+    },
+    "light": {
+      "values": ["shade", "bright_indirect", "sun"],
+      "migrate": {
+        "глубокая полутень": "shade",
+        "рассеянный свет": "bright_indirect",
+        "яркий свет / прямое солнце": "sun"
+      }
+    },
+    "temperature": {
+      "values": ["room", "cool", "warm"],
+      "ranges_c": { "room": [20, 25], "cool": [10, 18], "warm": [25, 30] },
+      "migrate": {
+        "комнатный (20–25 °C)": "room",
+        "прохладный / с зимовкой (10–18 °C)": "cool",
+        "теплый тропический (25–30 °C)": "warm"
+      }
+    },
+    "airflow": {
+      "values": ["low", "mid", "high"],
+      "migrate": { "низкое": "low", "среднее": "mid", "высокое": "high" }
+    },
+    "climate": { "values": ["tropical", "temperate", "any"] },
+    "habitat": {
+      "values": ["ground", "epiphyte", "paludarium", "aquatic"],
+      "migrate": {
+        "наземное": "ground",
+        "эпифит": "epiphyte",
+        "палюдариум / болото": "paludarium",
+        "аквариумное": "aquatic"
+      },
+      "note": "описательное поле: НЕ пересекается; проверяется правилами против тары и декора"
+    },
+    "condensation": {
+      "values": ["yes", "no", "partial"],
+      "migrate": { "да": "yes", "нет": "no", "частично": "partial" }
+    },
+    "growth_rate": {
+      "values": ["slow", "medium", "aggressive"],
+      "migrate": {
+        "медленная": "slow",
+        "средняя": "medium",
+        "быстрая / агрессивная": "aggressive"
+      }
+    },
+    "spread_mechanism": {
+      "values": ["none", "carpet", "vine", "runners"],
+      "since": "1.3"
+    },
+    "layer_form": {
+      "values": ["carpet", "bush", "accent", "vine", "mount"],
+      "migrate": {
+        "почвопокровный (мох, ковер)": "carpet",
+        "средний куст": "bush",
+        "вертикальный акцент": "accent",
+        "ампельный / лиана": "vine",
+        "эпифит (на коряге/камне)": "mount"
+      },
+      "note": "описательное: НЕ пересекается; используется стилями и подсказками"
+    },
+    "size": {
+      "values": ["micro", "mini", "large"],
+      "migrate": {
+        "микро (до 5 см)": "micro",
+        "мини (5–15 см)": "mini",
+        "крупный (от 15 см)": "large"
+      }
+    },
+    "plant_toxicity": {
+      "values": ["safe", "toxic_if_eaten"],
+      "migrate": {
+        "безопасен": "safe",
+        "ядовит при поедании": "toxic_if_eaten"
+      }
+    },
+    "care_level": {
+      "values": ["easy", "medium", "expert"],
+      "migrate": { "легко": "easy", "средне": "medium", "эксперт": "expert" }
+    },
+    "dormancy": {
+      "values": ["none", "cool_winter", "dry_winter"],
+      "migrate": {
+        "нет": "none",
+        "прохладная зимовка": "cool_winter",
+        "сухая зимовка": "dry_winter"
+      }
+    },
+    "fauna_role": {
+      "values": ["cleanup", "digger", "predator", "pest"],
+      "migrate": {
+        "санитар-деструктор (ест плесень и опад)": "cleanup",
+        "рыхлитель грунта": "digger",
+        "хищник (защита от вредителей)": "predator",
+        "вредитель / неконтролируемое размножение": "pest"
+      },
+      "note": "описательное: НЕ пересекается; правила считаются по количеству"
+    },
+    "plant_interest": {
+      "values": ["none", "nibbles", "eats_live"],
+      "migrate": {
+        "не трогает (только гниль и грибки)": "none",
+        "может подъедать нежные побеги и мох": "nibbles",
+        "активно ест живую зелень": "eats_live"
+      }
+    },
+    "adult_size": {
+      "values": ["micro", "small", "large"],
+      "migrate": {
+        "микро (1–3 мм)": "micro",
+        "мелкий (3–7 мм)": "small",
+        "средний и крупный (от 1 см)": "large"
+      }
+    },
+    "feeding": {
+      "values": ["autonomous", "needs_feeding"],
+      "migrate": {
+        "автономный (хватает органики в банке)": "autonomous",
+        "требует подкормки (опад, сепия, овощи)": "needs_feeding"
+      }
+    },
+    "digging": {
+      "values": ["surface", "burrowing"],
+      "migrate": {
+        "поверхностный (не портит слои)": "surface",
+        "роющий (смешает гранит с землей)": "burrowing"
+      }
+    },
+    "fauna_toxicity": {
+      "values": ["safe", "toxic_secret"],
+      "migrate": {
+        "безопасен": "safe",
+        "выделяет токсичный секрет при стрессе": "toxic_secret"
+      }
+    },
+    "group": {
+      "values": [
+        "mosses",
+        "ferns",
+        "foliage",
+        "vines",
+        "orchids",
+        "bromeliads",
+        "carnivores",
+        "flowering",
+        "succulents",
+        "micro_cleanup",
+        "isopods_show",
+        "other_inverts"
+      ],
+      "migrate": {
+        "Мхи и печеночники": "mosses",
+        "Папоротники и плауновидные": "ferns",
+        "Декоративно-лиственные и почвопокровные": "foliage",
+        "Ампельные и лианы": "vines",
+        "Орхидеи": "orchids",
+        "Бромелиевые и эпифиты": "bromeliads",
+        "Насекомоядные растения": "carnivores",
+        "Цветущие": "flowering",
+        "Суккуленты и полусуккуленты": "succulents",
+        "Микро-санитары": "micro_cleanup",
+        "Декоративные и крупные мокрицы": "isopods_show",
+        "Другие беспозвоночные": "other_inverts"
+      }
+    },
+    "ph_zone": {
+      "values": ["acid", "slightly_acid", "neutral", "alkaline"],
+      "ranges": {
+        "acid": [3.5, 5.5],
+        "slightly_acid": [5.5, 6.5],
+        "neutral": [6.5, 7.5],
+        "alkaline": [7.5, 8.5]
+      },
+      "since": "1.3"
+    },
+    "water_quality": {
+      "values": ["any", "soft", "distilled_only"],
+      "since": "1.3"
+    },
+    "photo_form": {
+      "values": ["wild_type", "cultivar", "illustration"],
+      "since": "1.3"
+    },
+    "license": {
+      "values": ["CC0-1.0", "CC-BY-4.0", "generated"],
+      "since": "1.3"
+    },
+    "placement": {
+      "values": [
+        "north",
+        "east_west",
+        "south_shaded",
+        "south_direct",
+        "room_depth",
+        "lamp_only"
+      ],
+      "since": "1.3",
+      "note": "карта placement → доступный свет и риск перегрева — в norms.json"
+    },
+    "water_type": {
+      "values": ["distilled", "soft", "tap_hard"],
+      "since": "1.3"
+    },
+    "experience": { "values": ["beginner", "experienced"], "since": "1.3" },
+    "vessel_shape": {
+      "values": [
+        "bowl",
+        "jar",
+        "cube",
+        "bottle",
+        "sphere",
+        "geo_house",
+        "tank"
+      ],
+      "since": "1.3"
+    },
+    "closure": {
+      "values": ["sealable", "vented", "open_top", "mesh"],
+      "since": "1.3"
+    },
+    "severity": { "values": ["block", "warning", "info"], "since": "1.3" }
+  },
+
+  "inputs": {
+    "vessel": {
+      "mode": {
+        "type": "enum",
+        "values": ["have", "choose"],
+        "required": true,
+        "note": "have — своя тара; choose — подбор тары под сборку (outputs.vessel_recommendation)"
+      },
+      "shape": { "type": "enum", "enum": "vessel_shape", "required": true },
+      "dims_cm": {
+        "type": "object",
+        "fields": ["diameter_cm", "width_cm", "depth_cm", "height_cm"],
+        "required": "по форме; либо volume_liters_label + height_cm"
+      },
+      "volume_liters_label": {
+        "type": "number",
+        "required": false,
+        "note": "литры с этикетки для неправильных форм (бутыль)"
+      },
+      "closure": { "type": "enum", "enum": "closure", "required": true },
+      "neck_diameter_cm": { "type": "number", "required": false }
+    },
+    "system_type": { "type": "enum", "enum": "system_type", "required": true },
+    "placement": {
+      "type": "enum",
+      "enum": "placement",
+      "required": true,
+      "default": "east_west"
+    },
+    "water_type": {
+      "type": "enum",
+      "enum": "water_type",
+      "required": true,
+      "default": "soft"
+    },
+    "experience": {
+      "type": "enum",
+      "enum": "experience",
+      "required": true,
+      "default": "beginner"
+    },
+    "style": {
+      "type": "string",
+      "required": false,
+      "note": "id из styles.json; фильтрует пул и включает композиционные правила"
+    },
+    "has_open_water": { "type": "boolean", "default": false },
+    "has_wintering": { "type": "boolean", "default": false },
+    "has_grow_light": {
+      "type": "boolean",
+      "default": false,
+      "note": "авто-true при placement = lamp_only"
+    }
+  },
+
+  "derived": {
+    "volume_liters": "из dims по формулам norms.formulas[shape], иначе label; округление 0.1",
+    "footprint_cm2": "площадь дна из dims (формулы в norms)",
+    "layers_cm": "дренаж 2–4 (не более 20% высоты) + разделитель + субстрат по типу — нормы в norms.json",
+    "free_height_cm": "height − слои − запас 2–3 см",
+    "neck_class": "narrow при neck_diameter_cm < 8 или shape = bottle, иначе wide",
+    "allowed_systems": {
+      "sealable": ["closed", "semi", "open"],
+      "vented": ["semi", "open"],
+      "open_top": ["open"],
+      "mesh": ["open"]
+    },
+    "light_available": "norms.placement_map[placement] → массив ключей light + overheat_risk",
+    "ph_corridor": "пересечение ph_tolerance всех растений ∩ ph_zones субстрата ∩ ph_zones камней ∩ ограничение water_type",
+    "light_corridor": "пересечение light всех растений; оптимумы проверяются отдельно (r_light_optimum_mismatch)",
+    "substrate_candidates": "глобальное пересечение substrate растений и фауны; если >1 — выбор по стилю/биотопу или пользователем",
+    "capacity_ratio": "Σ площадь_посадки(size) × (aggressive ? 1.5 : 1) / footprint_cm2; нормы площадей в norms.json",
+    "limiting": "лимитирующие виды для генератора ухода: полив — по самому чувствительному к переливу; свет — коридор+оптимумы; температура — самое узкое окно; влажность — пересечение"
+  },
+
+  "ph_model": {
+    "contributors": {
+      "plants": "ph_tolerance (массив зон)",
+      "substrate": "materials.substrates[].ph_zones",
+      "stones": "materials.stones[].ph_zones; ph_test_required=true не исключает, а даёт warning",
+      "water_type": {
+        "tap_hard": ["slightly_acid", "neutral", "alkaline"],
+        "soft": "все зоны",
+        "distilled": "все зоны"
+      }
+    },
+    "result": "пусто → r_ph_conflict (block) со списком виновников и альтернативами; одна зона → r_ph_narrow (warning)"
+  },
+
+  "fields": {
+    "plant": {
+      "id": {
+        "type": "string",
+        "required": true,
+        "note": "префикс plant_, уникален"
+      },
+      "slug": {
+        "type": "string",
+        "required": true,
+        "since": "1.3",
+        "note": "короткий уникальный ключ для URL (fittonia, selaginella…)"
+      },
+      "name_ru": { "type": "string", "required": true },
+      "name_en": { "type": "string", "required": true, "since": "1.3" },
+      "name_latin": { "type": "string", "required": true },
+      "group": { "type": "enum", "enum": "group", "required": true },
+      "system_type": {
+        "type": "enum[]",
+        "enum": "system_type",
+        "required": true
+      },
+      "air_humidity": {
+        "type": "enum[]",
+        "enum": "air_humidity",
+        "required": true
+      },
+      "soil_humidity": {
+        "type": "enum[]",
+        "enum": "soil_humidity",
+        "required": true
+      },
+      "substrate": { "type": "enum[]", "enum": "substrate", "required": true },
+      "light": {
+        "type": "enum[]",
+        "enum": "light",
+        "required": true,
+        "note": "допуски"
+      },
+      "light_optimum": {
+        "type": "enum",
+        "enum": "light",
+        "required": true,
+        "since": "1.3",
+        "note": "обязан входить в light"
+      },
+      "temperature": {
+        "type": "enum[]",
+        "enum": "temperature",
+        "required": true
+      },
+      "airflow": { "type": "enum", "enum": "airflow", "required": true },
+      "climate": { "type": "enum", "enum": "climate", "required": true },
+      "habitat": { "type": "enum[]", "enum": "habitat", "required": true },
+      "condensation": {
+        "type": "enum",
+        "enum": "condensation",
+        "required": true
+      },
+      "growth_rate": {
+        "type": "enum",
+        "enum": "growth_rate",
+        "required": true
+      },
+      "spread_mechanism": {
+        "type": "enum",
+        "enum": "spread_mechanism",
+        "required": true,
+        "since": "1.3"
+      },
+      "trim_interval_weeks": {
+        "type": "number|null",
+        "required": true,
+        "since": "1.3"
+      },
+      "layer_form": {
+        "type": "enum[]",
+        "enum": "layer_form",
+        "required": true
+      },
+      "size": { "type": "enum", "enum": "size", "required": true },
+      "height_cm": {
+        "type": "number",
+        "required": true,
+        "since": "1.3",
+        "note": "типичная высота в культуре со стрижкой"
+      },
+      "plant_toxicity": {
+        "type": "enum",
+        "enum": "plant_toxicity",
+        "required": true
+      },
+      "care_level": { "type": "enum", "enum": "care_level", "required": true },
+      "requires_grow_light": { "type": "boolean", "required": true },
+      "dormancy": { "type": "enum", "enum": "dormancy", "required": true },
+      "wintering_months": {
+        "type": "number[]|null",
+        "required": false,
+        "since": "1.3",
+        "note": "номера месяцев для календаря ухода"
+      },
+      "min_volume_closed_liters": { "type": "number", "required": true },
+      "min_volume_open_liters": { "type": "number", "required": true },
+      "ph_tolerance": {
+        "type": "enum[]",
+        "enum": "ph_zone",
+        "required": true,
+        "since": "1.3"
+      },
+      "water_quality": {
+        "type": "enum",
+        "enum": "water_quality",
+        "required": true,
+        "default": "any",
+        "since": "1.3"
+      },
+      "monocarpic": {
+        "type": "boolean",
+        "required": true,
+        "default": false,
+        "since": "1.3"
+      },
+      "needs_day_night_drop": {
+        "type": "boolean",
+        "required": true,
+        "default": false,
+        "since": "1.3"
+      },
+      "styles": {
+        "type": "string[]",
+        "required": true,
+        "since": "1.3",
+        "note": "id из styles.json"
+      },
+      "available": {
+        "type": "boolean",
+        "required": true,
+        "default": true,
+        "since": "1.3"
+      },
+      "image": { "type": "object", "required": true, "schema": "fields.image" },
+      "notes": "i18n: notes.<id> (текст в словарях, не в карточке)"
+    },
+    "fauna": {
+      "id": { "type": "string", "required": true, "note": "префикс fauna_" },
+      "slug": { "type": "string", "required": true, "since": "1.3" },
+      "name_ru": { "type": "string", "required": true },
+      "name_en": { "type": "string", "required": true, "since": "1.3" },
+      "name_latin": { "type": "string", "required": true },
+      "group": { "type": "enum", "enum": "group", "required": true },
+      "system_type": {
+        "type": "enum[]",
+        "enum": "system_type",
+        "required": true
+      },
+      "air_humidity": {
+        "type": "enum[]",
+        "enum": "air_humidity",
+        "required": true
+      },
+      "soil_humidity": {
+        "type": "enum[]",
+        "enum": "soil_humidity",
+        "required": true
+      },
+      "substrate": { "type": "enum[]", "enum": "substrate", "required": true },
+      "light": { "type": "enum[]", "enum": "light", "required": true },
+      "temperature": {
+        "type": "enum[]",
+        "enum": "temperature",
+        "required": true
+      },
+      "role": { "type": "enum[]", "enum": "fauna_role", "required": true },
+      "plant_interest": {
+        "type": "enum",
+        "enum": "plant_interest",
+        "required": true
+      },
+      "adult_size": { "type": "enum", "enum": "adult_size", "required": true },
+      "feeding": { "type": "enum", "enum": "feeding", "required": true },
+      "feeding_plan": {
+        "type": "object|null",
+        "required": false,
+        "since": "1.3",
+        "fields": ["interval_days", "items", "calcium_source"]
+      },
+      "digging": { "type": "enum", "enum": "digging", "required": true },
+      "fauna_toxicity": {
+        "type": "enum",
+        "enum": "fauna_toxicity",
+        "required": true
+      },
+      "min_volume_liters": { "type": "number", "required": true },
+      "starter_count": {
+        "type": "object|null",
+        "required": false,
+        "since": "1.3",
+        "fields": ["min", "recommended"]
+      },
+      "needs_land_zone": {
+        "type": "boolean",
+        "required": true,
+        "default": false,
+        "since": "1.3"
+      },
+      "available": {
+        "type": "boolean",
+        "required": true,
+        "default": true,
+        "since": "1.3",
+        "note": "fauna_earthworms: false"
+      },
+      "image": { "type": "object", "required": true, "schema": "fields.image" },
+      "notes": "i18n: notes.<id>"
+    },
+    "image": {
+      "file": {
+        "type": "string",
+        "required": true,
+        "note": "путь img/…, без пробелов в имени"
+      },
+      "photo_form": { "type": "enum", "enum": "photo_form", "required": true },
+      "license": { "type": "enum", "enum": "license", "required": true },
+      "author": { "type": "string|null", "required": true },
+      "source_url": { "type": "string|null", "required": true },
+      "attribution": {
+        "type": "string|null",
+        "required": true,
+        "note": "обязателен для CC-BY-4.0; для generated — null"
+      }
+    }
+  },
+
+  "volume_policy": {
+    "closed": { "hard_min_liters": 2, "recommended": [3, 10] },
+    "semi": { "hard_min_liters": 2, "recommended": [3, 15] },
+    "open_succulents": { "hard_min_liters": 1, "recommended": [1, 5] },
+    "open_tropical": { "hard_min_liters": 3, "recommended": [4, 15] },
+    "desktop_max_liters": 15,
+    "default_preset_liters": [3, 5],
+    "sphere_min_liters": 2,
+    "note": "Выше 15 л — класс «витрина», отложен. Черви скрыты (available=false): не рекомендуются для замкнутых систем."
+  },
+
+  "rules": [
+    {
+      "id": "r_system_type_mismatch",
+      "sev": "block",
+      "filter": true,
+      "when": "system_type карточки не содержит выбранный тип системы"
+    },
+    {
+      "id": "r_system_airflow_high",
+      "sev": "block",
+      "when": "airflow=high + closed"
+    },
+    {
+      "id": "r_system_airflow_medium",
+      "sev": "warning",
+      "when": "airflow=mid + closed: нужна активная колония коллембол и периодическая вентиляция"
+    },
+    {
+      "id": "r_condensation_closed",
+      "sev": "block",
+      "when": "closed + condensation != yes"
+    },
+    {
+      "id": "r_condensation_semi",
+      "sev": "block",
+      "when": "semi + condensation = no"
+    },
+    {
+      "id": "r_habitat_aquatic",
+      "sev": "block",
+      "when": "habitat содержит aquatic/paludarium + has_open_water=false"
+    },
+    {
+      "id": "r_volume_plant_closed",
+      "sev": "block",
+      "filter": true,
+      "when": "closed + volume < min_volume_closed_liters"
+    },
+    {
+      "id": "r_volume_plant_open",
+      "sev": "block",
+      "filter": true,
+      "when": "semi/open + volume < min_volume_open_liters"
+    },
+    {
+      "id": "r_volume_fauna",
+      "sev": "block",
+      "filter": true,
+      "when": "volume < fauna.min_volume_liters"
+    },
+    {
+      "id": "r_digging_small",
+      "sev": "block",
+      "when": "digging=burrowing + volume < 10"
+    },
+    {
+      "id": "r_plant_interest_large",
+      "sev": "block",
+      "when": "plant_interest=eats_live + volume < 10"
+    },
+    {
+      "id": "r_plant_interest_small",
+      "sev": "warning",
+      "when": "plant_interest=nibbles + volume < 5"
+    },
+    {
+      "id": "r_toxicity_plant_fauna",
+      "sev": "warning",
+      "when": "plant_toxicity=toxic_if_eaten + fauna.plant_interest != none"
+    },
+    {
+      "id": "r_fauna_secret",
+      "sev": "warning",
+      "when": "fauna_toxicity=toxic_secret + есть другая фауна"
+    },
+    {
+      "id": "r_climate_mix",
+      "sev": "warning",
+      "when": "в сборке есть temperate и tropical + has_wintering=false"
+    },
+    {
+      "id": "r_dormancy",
+      "sev": "warning",
+      "when": "dormancy != none + closed + has_wintering=false"
+    },
+    {
+      "id": "r_grow_light",
+      "sev": "warning",
+      "when": "requires_grow_light=true + has_grow_light=false"
+    },
+    {
+      "id": "r_growth_aggressive",
+      "sev": "warning",
+      "when": "growth_rate=aggressive + volume < 5"
+    },
+    {
+      "id": "r_multiple_aggressive",
+      "sev": "warning",
+      "when": "более 2 растений с growth_rate=aggressive"
+    },
+    {
+      "id": "r_feeding_closed",
+      "sev": "warning",
+      "when": "feeding=needs_feeding + closed"
+    },
+    {
+      "id": "r_fauna_pest",
+      "sev": "warning",
+      "when": "role содержит pest — всегда"
+    },
+    {
+      "id": "r_multiple_predators",
+      "sev": "warning",
+      "when": "более 1 вида фауны с role=predator"
+    },
+    {
+      "id": "r_global_intersection",
+      "sev": "block",
+      "when": "глобальное пересечение любого из полей air_humidity/soil_humidity/substrate/light/temperature по всей сборке пусто; виновники определяются попарно"
+    },
+    {
+      "id": "r_light_optimum_mismatch",
+      "sev": "warning",
+      "when": "light_corridor непуст, но light_optimum кого-то вне коридора: компромиссный свет"
+    },
+    {
+      "id": "r_no_cleanup_crew",
+      "sev": "warning",
+      "when": "closed/semi + нет фауны с role=cleanup: запустите коллембол за 1–2 недели до посадки"
+    },
+    {
+      "id": "r_closed_direct_sun",
+      "sev": "block",
+      "when": "placement=south_direct + closed: парниковый перегрев (+10–15 °C за час)"
+    },
+    {
+      "id": "r_semi_direct_sun",
+      "sev": "warning",
+      "when": "placement=south_direct + semi: притенение обязательно"
+    },
+    {
+      "id": "r_water_distilled_required",
+      "sev": "block",
+      "when": "water_type=tap_hard + есть виды с water_quality=distilled_only (хищники, сфагнум)"
+    },
+    {
+      "id": "r_water_soft_recommended",
+      "sev": "warning",
+      "when": "water_type=tap_hard + есть виды с water_quality=soft: налёт на стекле, засоление"
+    },
+    {
+      "id": "r_ph_conflict",
+      "sev": "block",
+      "when": "ph_corridor пуст: назвать виновников (напр. мрамор + росянка), предложить alternatives из карточки камня"
+    },
+    {
+      "id": "r_ph_narrow",
+      "sev": "warning",
+      "when": "ph_corridor = одна зона: узкий коридор, контроль полива и камней"
+    },
+    {
+      "id": "r_ph_test_required",
+      "sev": "warning",
+      "when": "выбран камень с ph_test_required=true: уксусный тест + замачивание 3–5 дней"
+    },
+    {
+      "id": "r_calcium_vs_acid",
+      "sev": "warning",
+      "when": "фауна needs_feeding + субстрат carnivore_acid/moss_acid: сепия и корм локально на кормовом столике, не в грунт"
+    },
+    {
+      "id": "r_digging_style",
+      "sev": "warning",
+      "when": "digging=burrowing + стиль iwagumi_rocky/minimal_modern: роющие разрушают геометрию слоёв"
+    },
+    {
+      "id": "r_experience",
+      "sev": "warning",
+      "when": "experience=beginner + есть care_level=expert: предложить замену попроще"
+    },
+    {
+      "id": "r_narrow_neck",
+      "sev": "warning",
+      "when": "neck_class=narrow: посадка пинцетом, обслуживание ограничено; рекомендуем closed"
+    },
+    {
+      "id": "r_vessel_closure",
+      "sev": "block",
+      "when": "system_type не входит в allowed_systems(closure): геометрический домик не бывает герметичным"
+    },
+    {
+      "id": "r_height_overflow",
+      "sev": "warning",
+      "when": "пряостоячее растение: free_height < height_cm <= free_height×1.5: потребуется стрижка; лианам — info направить на фон"
+    },
+    {
+      "id": "r_height_no_fit",
+      "sev": "block",
+      "when": "пряостоячее растение: height_cm > free_height×1.5: не влезет даже со стрижкой"
+    },
+    {
+      "id": "r_overcrowding",
+      "sev": "warning",
+      "when": "capacity_ratio > 0.7"
+    },
+    {
+      "id": "r_overcrowding_hard",
+      "sev": "block",
+      "when": "capacity_ratio > 1.0"
+    },
+    {
+      "id": "r_shallow",
+      "sev": "block",
+      "when": "free_height_cm < 8: допускаются только micro и carpet"
+    },
+    {
+      "id": "r_open_fauna_cover",
+      "sev": "warning",
+      "when": "open + есть фауна: сетчатая крышка (улитки убегают, влага уходит)"
+    },
+    {
+      "id": "r_paludarium_min",
+      "sev": "warning",
+      "when": "has_open_water + footprint_cm2 < 300: вода+суша слишком тесно"
+    },
+    {
+      "id": "r_epiphyte_mount",
+      "sev": "info",
+      "when": "растение только-эпифит + в декоре нет коряги/камня для крепления"
+    },
+    {
+      "id": "r_litter_feeding",
+      "sev": "info",
+      "when": "декор содержит опад + фауна needs_feeding: корм уже в декоре, обновлять раз в 1–2 месяца"
+    },
+    {
+      "id": "r_monocarpic",
+      "sev": "info",
+      "when": "есть monocarpic=true: розетка отмирает после цветения, оставляйте детки"
+    },
+    {
+      "id": "r_day_night_drop",
+      "sev": "warning",
+      "when": "needs_day_night_drop=true + closed: без перепада день/ночь кувшины не формируются"
+    },
+    {
+      "id": "r_stone_sharp_fauna",
+      "sev": "info",
+      "when": "камень sharp_edges=true + есть фауна: сгладить сколы напильником"
+    }
+  ],
+
+  "algorithm": {
+    "constraint_multi_fields": [
+      "air_humidity",
+      "soil_humidity",
+      "substrate",
+      "light",
+      "temperature"
+    ],
+    "descriptive_multi_fields": ["layer_form", "role", "habitat", "styles"],
+    "steps": [
+      "0. Нормализовать входы; из тары вычислить volume, footprint, слои, free_height, neck_class, allowed_systems; из placement — light_available и overheat_risk; применить volume_policy.",
+      "1. Предфильтр каталога (невидимые отсечения): available=true; system_type содержит выбранный; объём >= min по типу системы; habitat против has_open_water; light ∩ light_available непусто; r_height_no_fit; r_shallow. Если выбран стиль — сузить пул до styles.",
+      "2. Пользователь выбирает растения, фауну, камни, декор; субстрат — из substrate_candidates (авто по стилю/биотопу или выбор пользователя).",
+      "3. Глобальное пересечение каждого constraint-поля по ВСЕЙ сборке. Пусто → block; виновные пары найти попарными пересечениями для адресных сообщений. Описательные поля НЕ пересекать.",
+      "4. Скалярные правила карточек (condensation, airflow, dormancy, toxicity, digging, interest, feeding…).",
+      "5. Правила уровня сборки: счётчики, санитары, тара, высота, вместимость, стиль, вода.",
+      "6. pH-коридор: растения ∩ субстрат ∩ камни ∩ вода; пусто → block с альтернативами; камни с ph_test_required → warning.",
+      "7. Агрегация: block → warning → info; каждый hit несёт rule_id, виновников (ids), i18n msg + remedy.",
+      "8. Есть block → сборку нельзя финализировать; предложить замены (та же группа/ярус/стиль, совместимые параметры) — вычисляются, не хардкодятся.",
+      "9. Валидная сборка → outputs: шпаргалка ухода (лимитирующие виды + care_templates), список покупок (слои × footprint + starter_count), контекстная диагностика, share_url, save-payload, ai_prompt."
+    ]
+  },
+
+  "outputs": {
+    "saved_builds": {
+      "storage": "localStorage",
+      "key": "florarium.builds.v1",
+      "payload": {
+        "schema_version": "1.3",
+        "name": "string",
+        "created_at": "ISO",
+        "vessel": "inputs.vessel",
+        "inputs": "все inputs",
+        "items": ["id"],
+        "stones": ["id"],
+        "decor": ["id"],
+        "substrate": "key"
+      },
+      "ops": ["save", "load", "delete", "export_json", "import_json"],
+      "import_validation": "schema_version + существование всех id в каталоге"
+    },
+    "share_url": {
+      "params": {
+        "v": "13",
+        "sys": "system_type",
+        "vol": "литры",
+        "shape": "vessel_shape",
+        "dims": "компактно",
+        "place": "placement",
+        "water": "water_type",
+        "exp": "experience",
+        "style": "id?",
+        "items": "slug,slug,…",
+        "stones": "slug,…",
+        "decor": "slug,…"
+      },
+      "restore_on_load": true,
+      "copy_to_clipboard": true,
+      "toast": "i18n: share.toast"
+    },
+    "ai_check": {
+      "max_chars": 2000,
+      "template": "i18n: ai.prompt",
+      "include": {
+        "vessel": ["volume", "system_type", "placement", "water_type"],
+        "plants": [
+          "name_ru",
+          "name_latin",
+          "layer_form",
+          "growth_rate",
+          "air_humidity",
+          "condensation"
+        ],
+        "fauna": ["name_ru", "role", "plant_interest"],
+        "ask": [
+          "биосовместимость",
+          "риск загнивания",
+          "перенаселение",
+          "рекомендации по грунту",
+          "критические ошибки"
+        ]
+      },
+      "targets": [
+        { "id": "google", "url": "https://google.com" },
+        { "id": "perplexity", "url": "https://perplexity.ai" },
+        { "id": "copy_only" }
+      ],
+      "behavior": "сначала буфер обмена → новая вкладка URL + encodeURIComponent(prompt) → toast-подсказка «Текст скопирован, нажмите Ctrl+V если не подставилось»"
+    },
+    "vessel_recommendation": {
+      "note": "режим choose: из желаемого набора вычислить min_volume, min_footprint, min_free_height, нужный closure → 2–3 пресета из vessels.json с обоснованием"
+    },
+    "care_sheet": "care_templates.json + derived.limiting",
+    "diagnostics": "diagnostics.json, ранжирование причин по параметрам сборки",
+    "bom": "norms.json (слои, площади посадки) × derived.footprint + starter_count фауны"
+  },
+
+  "migration": {
+    "step0": "trim всех ключей и значений файлов 1.2 (везде хвостовые пробелы)",
+    "enum_maps": "enums.*.migrate",
+    "field_renames": {
+      "toxicity_for_fauna": "plant_toxicity (растения) / fauna_toxicity (фауна)"
+    },
+    "dropped": ["min_volume", "min_volume_display"],
+    "notes_to_i18n": "notes.<id> в оба словаря",
+    "data_fixes": [
+      "сфагнум, леукобриум, дикранум, политрихум: добавить carnivore_acid и moss_acid в substrate (разблокировать биотоп росянка+сфагнум)",
+      "fauna_earthworms: available=false",
+      "монстера: image → новая генерация (adansonii), photo_form=illustration",
+      "яванский и рождественский мхи: image → генерации, photo_form=illustration (убрать BY-SA из стека)",
+      "всем диким формам: photo_form=wild_type + подпись-дисклеймер; сгенерированным: illustration"
+    ]
+  },
+
+  "self_check": [
+    "все id и slug уникальны",
+    "все enum-значения валидны, light_optimum входит в light",
+    "у каждого правила есть rules.<id>.msg и rules.<id>.remedy в ru и en",
+    "у каждой карточки image.file существует в /img, в именах файлов нет пробелов",
+    "нет хвостовых пробелов в ключах и значениях",
+    "ph_tolerance непустой у всех растений",
+    "styles ссылаются на существующие id стилей",
+    "доступные (available=true) виды покрывают каждый стиль и каждый ярус"
+  ]
+}
