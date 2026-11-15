@@ -1,0 +1,166 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "file": "data/diagnostics.json",
+    "purpose": "Контекстная диагностика: симптом → причины, ранжированные по параметрам сборки → решения.",
+    "locale": "Тексты — i18n diag.<symptom>.name / diag.<symptom>.cause.<n> / .fix.<n> / .prev.<n>.",
+    "depends": ["criteria.json", "norms.json", "plants_fauna.json"],
+    "condition_vocabulary": "идентичен care_templates.meta.condition_vocabulary",
+    "ranking": "score = base_weight + сумма boost.add, где boost.when истинно; причины сортируются по score убыв., показываются топ-3",
+    "note": "Белый сухой налёт ≠ плесень; это первый кейс, который комбинатор должен различать по water_type."
+  },
+  "symptoms": [
+    {
+      "id": "mold_white_fuzz", "name_key": "diag.mold_white_fuzz.name",
+      "causes": [
+        { "cause_key": "diag.mold_white_fuzz.cause.overwater_stagnant", "base_weight": 8, "boosts": [ { "when": { "system_in": ["closed"] }, "add": 3 }, { "when": { "no_fauna_role": ["cleanup"] }, "add": 3 } ], "fix_key": "diag.mold_white_fuzz.fix.overwater_stagnant", "prevention_key": "diag.mold_white_fuzz.prev.overwater_stagnant" },
+        { "cause_key": "diag.mold_white_fuzz.cause.poor_airflow", "base_weight": 5, "boosts": [ { "when": { "system_in": ["closed"] }, "add": 2 } ], "fix_key": "diag.mold_white_fuzz.fix.poor_airflow", "prevention_key": "diag.mold_white_fuzz.prev.poor_airflow" },
+        { "cause_key": "diag.mold_white_fuzz.cause.decaying_leaves", "base_weight": 4, "boosts": [ { "when": { "no_fauna_role": ["cleanup"] }, "add": 2 } ], "fix_key": "diag.mold_white_fuzz.fix.decaying_leaves", "prevention_key": "diag.mold_white_fuzz.prev.decaying_leaves" }
+      ]
+    },
+    {
+      "id": "white_dry_crust", "name_key": "diag.white_dry_crust.name",
+      "causes": [
+        { "cause_key": "diag.white_dry_crust.cause.hard_water_salts", "base_weight": 6, "boosts": [ { "when": { "input_is": { "field": "water_type", "value": "tap_hard" } }, "add": 6 } ], "fix_key": "diag.white_dry_crust.fix.hard_water_salts", "prevention_key": "diag.white_dry_crust.prev.hard_water_salts" }
+      ]
+    },
+    {
+      "id": "sour_smell", "name_key": "diag.sour_smell.name",
+      "causes": [
+        { "cause_key": "diag.sour_smell.cause.acidification", "base_weight": 7, "boosts": [ { "when": { "system_in": ["closed"] }, "add": 2 } ], "fix_key": "diag.sour_smell.fix.acidification", "prevention_key": "diag.sour_smell.prev.acidification" }
+      ]
+    },
+    {
+      "id": "rotten_egg_smell", "name_key": "diag.rotten_egg_smell.name",
+      "causes": [
+        { "cause_key": "diag.rotten_egg_smell.cause.anaerobic", "base_weight": 9, "boosts": [ { "when": { "system_in": ["closed"] }, "add": 2 } ], "fix_key": "diag.rotten_egg_smell.fix.anaerobic", "prevention_key": "diag.rotten_egg_smell.prev.anaerobic" }
+      ]
+    },
+    {
+      "id": "soil_cemented", "name_key": "diag.soil_cemented.name",
+      "causes": [
+        { "cause_key": "diag.soil_cemented.cause.fine_sand", "base_weight": 7, "boosts": [ { "when": { "substrate_in": ["succulent_mineral"] }, "add": 2 } ], "fix_key": "diag.soil_cemented.fix.fine_sand", "prevention_key": "diag.soil_cemented.prev.fine_sand" }
+      ]
+    },
+    {
+      "id": "roots_surface", "name_key": "diag.roots_surface.name",
+      "causes": [
+        { "cause_key": "diag.roots_surface.cause.dense_soil", "base_weight": 6, "boosts": [], "fix_key": "diag.roots_surface.fix.dense_soil", "prevention_key": "diag.roots_surface.prev.dense_soil" }
+      ]
+    },
+    {
+      "id": "wilt_wet", "name_key": "diag.wilt_wet.name",
+      "causes": [
+        { "cause_key": "diag.wilt_wet.cause.root_rot", "base_weight": 8, "boosts": [ { "when": { "system_in": ["closed"] }, "add": 2 } ], "fix_key": "diag.wilt_wet.fix.root_rot", "prevention_key": "diag.wilt_wet.prev.root_rot" }
+      ]
+    },
+    {
+      "id": "wilt_dry", "name_key": "diag.wilt_dry.name",
+      "causes": [
+        { "cause_key": "diag.wilt_dry.cause.underwater", "base_weight": 7, "boosts": [ { "when": { "system_in": ["open"] }, "add": 2 } ], "fix_key": "diag.wilt_dry.fix.underwater", "prevention_key": "diag.wilt_dry.prev.underwater" }
+      ]
+    },
+    {
+      "id": "green_film", "name_key": "diag.green_film.name",
+      "causes": [
+        { "cause_key": "diag.green_film.cause.algae", "base_weight": 6, "boosts": [ { "when": { "light_corridor_has": "sun" }, "add": 2 } ], "fix_key": "diag.green_film.fix.algae", "prevention_key": "diag.green_film.prev.algae" }
+      ]
+    },
+    {
+      "id": "fungus_gnats", "name_key": "diag.fungus_gnats.name",
+      "causes": [
+        { "cause_key": "diag.fungus_gnats.cause.overwater_organic", "base_weight": 7, "boosts": [ { "when": { "no_fauna_role": ["predator"] }, "add": 2 } ], "fix_key": "diag.fungus_gnats.fix.overwater_organic", "prevention_key": "diag.fungus_gnats.prev.overwater_organic" }
+      ]
+    },
+    {
+      "id": "leggy_pale", "name_key": "diag.leggy_pale.name",
+      "causes": [
+        { "cause_key": "diag.leggy_pale.cause.low_light", "base_weight": 8, "boosts": [ { "when": { "input_is": { "field": "placement", "value": "room_depth" } }, "add": 3 }, { "when": { "input_flag": "has_grow_light_false" }, "add": 2 } ], "fix_key": "diag.leggy_pale.fix.low_light", "prevention_key": "diag.leggy_pale.prev.low_light" }
+      ]
+    },
+    {
+      "id": "soft_rotting_stems", "name_key": "diag.soft_rotting_stems.name",
+      "causes": [
+        { "cause_key": "diag.soft_rotting_stems.cause.root_rot", "base_weight": 8, "boosts": [ { "when": { "system_in": ["closed"] }, "add": 2 } ], "fix_key": "diag.soft_rotting_stems.fix.root_rot", "prevention_key": "diag.soft_rotting_stems.prev.root_rot" }
+      ]
+    },
+    {
+      "id": "spider_mites", "name_key": "diag.spider_mites.name",
+      "causes": [
+        { "cause_key": "diag.spider_mites.cause.dry_air", "base_weight": 6, "boosts": [ { "when": { "any_plant": { "slug": "calathea" } }, "add": 3 }, { "when": { "system_in": ["open"] }, "add": 2 } ], "fix_key": "diag.spider_mites.fix.dry_air", "prevention_key": "diag.spider_mites.prev.dry_air" }
+      ]
+    },
+    {
+      "id": "whiteflies", "name_key": "diag.whiteflies.name",
+      "causes": [
+        { "cause_key": "diag.whiteflies.cause.temperate_warm", "base_weight": 5, "boosts": [ { "when": { "any_plant": { "slug": "fuchsia" } }, "add": 2 } ], "fix_key": "diag.whiteflies.fix.temperate_warm", "prevention_key": "diag.whiteflies.prev.temperate_warm" }
+      ]
+    },
+    {
+      "id": "scale_insects", "name_key": "diag.scale_insects.name",
+      "causes": [
+        { "cause_key": "diag.scale_insects.cause.stagnant_air", "base_weight": 5, "boosts": [ { "when": { "any_plant": { "slug": "hedera" } }, "add": 2 } ], "fix_key": "diag.scale_insects.fix.stagnant_air", "prevention_key": "diag.scale_insects.prev.stagnant_air" }
+      ]
+    },
+    {
+      "id": "springtails_on_glass", "name_key": "diag.springtails_on_glass.name",
+      "causes": [
+        { "cause_key": "diag.springtails_on_glass.cause.overwater_exit", "base_weight": 6, "boosts": [ { "when": { "system_in": ["closed"] }, "add": 2 } ], "fix_key": "diag.springtails_on_glass.fix.overwater_exit", "prevention_key": "diag.springtails_on_glass.prev.overwater_exit" }
+      ]
+    },
+    {
+      "id": "isopod_explosion", "name_key": "diag.isopod_explosion.name",
+      "causes": [
+        { "cause_key": "diag.isopod_explosion.cause.overfeeding", "base_weight": 7, "boosts": [ { "when": { "any_fauna": { "feeding": "needs_feeding" } }, "add": 2 } ], "fix_key": "diag.isopod_explosion.fix.overfeeding", "prevention_key": "diag.isopod_explosion.prev.overfeeding" }
+      ]
+    },
+    {
+      "id": "springtail_crash", "name_key": "diag.springtail_crash.name",
+      "causes": [
+        { "cause_key": "diag.springtail_crash.cause.dryout", "base_weight": 6, "boosts": [ { "when": { "system_in": ["open"] }, "add": 2 }, { "when": { "substrate_in": ["succulent_mineral"] }, "add": 3 } ], "fix_key": "diag.springtail_crash.fix.dryout", "prevention_key": "diag.springtail_crash.prev.dryout" }
+      ]
+    },
+    {
+      "id": "planaria_hydra", "name_key": "diag.planaria_hydra.name",
+      "causes": [
+        { "cause_key": "diag.planaria_hydra.cause.open_water_overfeed", "base_weight": 7, "boosts": [ { "when": { "input_flag": "has_open_water" }, "add": 5 } ], "fix_key": "diag.planaria_hydra.fix.open_water_overfeed", "prevention_key": "diag.planaria_hydra.prev.open_water_overfeed" }
+      ]
+    },
+    {
+      "id": "condensation_all_day", "name_key": "diag.condensation_all_day.name",
+      "causes": [
+        { "cause_key": "diag.condensation_all_day.cause.overwater", "base_weight": 8, "boosts": [ { "when": { "system_in": ["closed"] }, "add": 3 } ], "fix_key": "diag.condensation_all_day.fix.overwater", "prevention_key": "diag.condensation_all_day.prev.overwater" }
+      ]
+    },
+    {
+      "id": "no_condensation", "name_key": "diag.no_condensation.name",
+      "causes": [
+        { "cause_key": "diag.no_condensation.cause.underwater", "base_weight": 7, "boosts": [ { "when": { "system_in": ["closed"] }, "add": 2 } ], "fix_key": "diag.no_condensation.fix.underwater", "prevention_key": "diag.no_condensation.prev.underwater" }
+      ]
+    },
+    {
+      "id": "etiolation_succulent", "name_key": "diag.etiolation_succulent.name",
+      "causes": [
+        { "cause_key": "diag.etiolation_succulent.cause.low_light", "base_weight": 8, "boosts": [ { "when": { "substrate_in": ["succulent_mineral"] }, "add": 3 } ], "fix_key": "diag.etiolation_succulent.fix.low_light", "prevention_key": "diag.etiolation_succulent.prev.low_light" }
+      ]
+    },
+    {
+      "id": "moss_browning", "name_key": "diag.moss_browning.name",
+      "causes": [
+        { "cause_key": "diag.moss_browning.cause.hard_water", "base_weight": 6, "boosts": [ { "when": { "input_is": { "field": "water_type", "value": "tap_hard" } }, "add": 3 }, { "when": { "stone_any": { "alkalizing": true } }, "add": 3 } ], "fix_key": "diag.moss_browning.fix.hard_water", "prevention_key": "diag.moss_browning.prev.hard_water" }
+      ]
+    },
+    {
+      "id": "leaves_on_glass_rot", "name_key": "diag.leaves_on_glass_rot.name",
+      "causes": [
+        { "cause_key": "diag.leaves_on_glass_rot.cause.touch_wet_glass", "base_weight": 6, "boosts": [ { "when": { "system_in": ["closed"] }, "add": 2 } ], "fix_key": "diag.leaves_on_glass_rot.fix.touch_wet_glass", "prevention_key": "diag.leaves_on_glass_rot.prev.touch_wet_glass" }
+      ]
+    },
+    {
+      "id": "bromeliad_cup_rot", "name_key": "diag.bromeliad_cup_rot.name",
+      "causes": [
+        { "cause_key": "diag.bromeliad_cup_rot.cause.stagnant_cup", "base_weight": 6, "boosts": [ { "when": { "any_plant": { "group": "bromeliads" } }, "add": 3 }, { "when": { "system_in": ["closed"] }, "add": 2 } ], "fix_key": "diag.bromeliad_cup_rot.fix.stagnant_cup", "prevention_key": "diag.bromeliad_cup_rot.prev.stagnant_cup" }
+      ]
+    }
+  ]
+}
