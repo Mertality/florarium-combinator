@@ -1430,7 +1430,7 @@ petrified wood.webp
 quartz.webp
 quartz_sand.webp
 river_pebbles.webp
-sea pebbles.webp
+sea_pebbles.webp
 Seiryu.webp
 serpentinite.webp
 slate.webp
