@@ -1,0 +1,108 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "file": "data/styles.json",
+    "purpose": "Стили флорариума: пулы камней/декора, предпочтения субстрата, композиционные проверки.",
+    "locale": "Тексты: i18n styles.<id>.name / .mood / .tips",
+    "depends": ["criteria.json", "materials.json", "plants_fauna.json"],
+    "principles": [
+      "Пул растений собирается из plants_fauna.styles[], здесь не дублируется",
+      "Композиционные проверки — warning/info (эстетика). Биологические запреты — только criteria.json",
+      "Камни и декор ссылаются на id из materials.json",
+      "stones_pool — рекомендация, не жёсткий фильтр: химию охраняет pH-модель"
+    ]
+  },
+  "checks": {
+    "min_plant_layers": "число различных layer_form среди выбранных растений (carpet/bush/accent/vine/mount)",
+    "carpet_share_min": "доля площади посадки, занятая ковровыми формами",
+    "plants_max": "максимум карточек растений",
+    "stone_species_max": "число различных id камней в сборке",
+    "layer_forbidden": "запрещённые ярусы: warning, если у растения есть такой layer_form",
+    "hardscape_share_min": "оценка доли дна под камнями/декором (нормы оценки — norms.json)",
+    "capacity_target": "целевой диапазон derived.capacity_ratio (info)",
+    "water_share": "доля открытой воды при has_open_water=true (info)",
+    "mount_recommended": "info: желателен ярус mount или коряга в декоре",
+    "vine_recommended": "info: желателен ярус vine"
+  },
+  "styles": [
+    {
+      "id": "taiga_wabikusa", "slug": "taiga",
+      "systems": ["closed", "semi"],
+      "substrates_preferred": ["moss_acid", "tropical"],
+      "stones_pool": ["slate", "granite", "volcanic", "ohko", "basalt", "petrified_wood"],
+      "stones_avoid": ["marble", "lemezit", "coquina", "travertine", "sea_pebbles", "concrete"],
+      "decor_pool": ["driftwood", "cork_bark", "alder_cones", "oak_litter"],
+      "composition": [
+        { "check": "min_plant_layers", "value": 2, "sev": "warning" },
+        { "check": "carpet_share_min", "value": 0.3, "sev": "info" },
+        { "check": "hardscape_share_min", "value": 0.25, "sev": "info" }
+      ]
+    },
+    {
+      "id": "tropical_jungle", "slug": "jungle",
+      "systems": ["closed", "semi"],
+      "substrates_preferred": ["tropical", "epiphytic"],
+      "stones_pool": ["ohko", "volcanic", "granite", "basalt"],
+      "stones_avoid": ["marble", "lemezit", "coquina", "travertine", "sea_pebbles", "concrete"],
+      "decor_pool": ["driftwood", "cork_bark"],
+      "composition": [
+        { "check": "min_plant_layers", "value": 3, "sev": "warning" },
+        { "check": "carpet_share_min", "value": 0.5, "sev": "warning" },
+        { "check": "capacity_target", "value": [0.5, 0.7], "sev": "info" },
+        { "check": "mount_recommended", "sev": "info" }
+      ]
+    },
+    {
+      "id": "iwagumi_rocky", "slug": "iwagumi",
+      "systems": ["semi", "closed"],
+      "substrates_preferred": ["moss_acid", "tropical"],
+      "stones_pool": ["slate", "granite", "jasper", "serpentinite", "seiryu"],
+      "stones_avoid": ["marble", "lemezit", "coquina", "travertine", "sea_pebbles", "concrete"],
+      "decor_pool": ["quartz_sand_top"],
+      "composition": [
+        { "check": "stone_species_max", "value": 1, "sev": "warning" },
+        { "check": "carpet_share_min", "value": 0.7, "sev": "warning" },
+        { "check": "plants_max", "value": 3, "sev": "warning" },
+        { "check": "layer_forbidden", "value": ["vine"], "sev": "warning" },
+        { "check": "hardscape_share_min", "value": 0.4, "sev": "info" }
+      ]
+    },
+    {
+      "id": "forest_stream", "slug": "stream",
+      "systems": ["semi", "closed"],
+      "substrates_preferred": ["tropical", "moss_acid"],
+      "stones_pool": ["granite", "quartz", "river_pebbles", "basalt", "quartz_sand"],
+      "stones_avoid": ["marble", "lemezit", "coquina", "travertine", "sea_pebbles", "concrete"],
+      "decor_pool": ["driftwood", "oak_litter"],
+      "composition": [
+        { "check": "min_plant_layers", "value": 2, "sev": "warning" },
+        { "check": "carpet_share_min", "value": 0.3, "sev": "info" },
+        { "check": "water_share", "value": [0.2, 0.4], "sev": "info" }
+      ]
+    },
+    {
+      "id": "ruins_postapo", "slug": "ruins",
+      "systems": ["closed", "semi", "open"],
+      "substrates_preferred": ["tropical", "moss_acid"],
+      "stones_pool": ["brick", "terracotta", "granite", "slate", "petrified_wood", "travertine", "concrete"],
+      "stones_avoid": [],
+      "decor_pool": ["aged_wood", "driftwood", "oak_litter"],
+      "composition": [
+        { "check": "hardscape_share_min", "value": 0.35, "sev": "info" },
+        { "check": "vine_recommended", "sev": "info" }
+      ]
+    },
+    {
+      "id": "minimal_modern", "slug": "minimal",
+      "systems": ["open", "semi", "closed"],
+      "substrates_preferred": ["succulent_mineral", "tropical", "moss_acid"],
+      "stones_pool": ["jasper", "slate", "granite", "quartz", "zoisite", "petrified_wood", "marble"],
+      "stones_avoid": [],
+      "decor_pool": ["quartz_sand_top"],
+      "composition": [
+        { "check": "plants_max", "value": 3, "sev": "warning" },
+        { "check": "stone_species_max", "value": 1, "sev": "info" }
+      ]
+    }
+  ]
+}
