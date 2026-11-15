@@ -1,0 +1,146 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "file": "data/vessels.json",
+    "purpose": "Пресеты тары: форма, габариты, крышка, совместимые системы и стили. Плюс алгоритм подбора тары под сборку (режим choose).",
+    "locale": "Названия в карточке (name_ru/name_en); подсказки и обоснования — i18n vessels.<id>.best_for / vessels.recommend.*",
+    "depends": ["criteria.json", "norms.json", "styles.json", "plants_fauna.json"],
+    "image_policy": "Фото не используются. UI рисует монохромный силуэт по полю shape (протокол стиля: без эмодзи/глифов).",
+    "volume_note": "volume_liters_approx — справочно; движок вычисляет объём и площадь дна из dims по norms.geometry."
+  },
+  "shape_facts": {
+    "bowl":      { "sealable": false, "neck": "wide",   "note": "Без крышки — только открытая система; сетка для фауны." },
+    "jar":       { "sealable": true,  "neck": "wide",   "note": "Универсал: бугель/пробка = закрытая, без крышки = открытая." },
+    "cube":      { "sealable": false, "neck": "wide",   "note": "Стеклянная крышка с зазором = полузакрытая; сетка для фауны." },
+    "bottle":    { "sealable": true,  "neck": "narrow", "note": "Узкое горло (<8 см): посадка пинцетом, обслуживание ограничено; рекомендуется закрытая." },
+    "sphere":    { "sealable": true,  "neck": "narrow", "min_volume_liters": 2, "note": "Меньше 2 л нестабильна — не предлагаем; только микро-сборки." },
+    "geo_house": { "sealable": false, "neck": "wide",   "note": "Паяные швы негерметичны — закрытая система невозможна (r_vessel_closure)." },
+    "tank":      { "sealable": false, "neck": "wide",   "note": "Палюдариум: вода + суша; сетка или крышка с зазором." }
+  },
+  "presets": [
+    {
+      "id": "vessel_bowl_small", "slug": "bowl-small", "shape": "bowl",
+      "name_ru": "Плошка малая", "name_en": "Small Bowl",
+      "dims_cm": { "diameter_cm": 20, "height_cm": 9 },
+      "volume_liters_approx": 1.8, "footprint_cm2_approx": 251,
+      "closure_default": "open_top", "closure_options": ["open_top", "mesh"],
+      "systems": ["open"], "styles": ["minimal_modern"],
+      "starter": false, "best_for": "vessels.bowl_small.best_for",
+      "image": null
+    },
+    {
+      "id": "vessel_bowl_wide", "slug": "bowl-wide", "shape": "bowl",
+      "name_ru": "Плошка широкая", "name_en": "Wide Bowl",
+      "dims_cm": { "diameter_cm": 26, "height_cm": 10 },
+      "volume_liters_approx": 3.5, "footprint_cm2_approx": 425,
+      "closure_default": "open_top", "closure_options": ["open_top", "mesh"],
+      "systems": ["open"], "styles": ["minimal_modern"],
+      "starter": true, "best_for": "vessels.bowl_wide.best_for",
+      "image": null
+    },
+    {
+      "id": "vessel_jar_3l", "slug": "jar-3l", "shape": "jar",
+      "name_ru": "Банка 3 л", "name_en": "3 L Jar",
+      "dims_cm": { "diameter_cm": 14, "height_cm": 20 },
+      "volume_liters_approx": 3.1, "footprint_cm2_approx": 154,
+      "closure_default": "sealable", "closure_options": ["sealable", "vented", "open_top", "mesh"],
+      "systems": ["closed", "semi", "open"], "styles": ["tropical_jungle", "taiga_wabikusa", "forest_stream"],
+      "starter": true, "best_for": "vessels.jar_3l.best_for",
+      "image": null
+    },
+    {
+      "id": "vessel_jar_5l", "slug": "jar-5l", "shape": "jar",
+      "name_ru": "Банка 5 л", "name_en": "5 L Jar",
+      "dims_cm": { "diameter_cm": 16, "height_cm": 25 },
+      "volume_liters_approx": 5.0, "footprint_cm2_approx": 201,
+      "closure_default": "sealable", "closure_options": ["sealable", "vented", "open_top", "mesh"],
+      "systems": ["closed", "semi", "open"], "styles": ["tropical_jungle", "taiga_wabikusa", "forest_stream", "ruins_postapo"],
+      "starter": true, "best_for": "vessels.jar_5l.best_for",
+      "image": null
+    },
+    {
+      "id": "vessel_jar_tall_8l", "slug": "jar-tall-8l", "shape": "jar",
+      "name_ru": "Банка высокая 8 л", "name_en": "Tall 8 L Jar",
+      "dims_cm": { "diameter_cm": 16, "height_cm": 40 },
+      "volume_liters_approx": 8.0, "footprint_cm2_approx": 201,
+      "closure_default": "sealable", "closure_options": ["sealable", "vented", "open_top", "mesh"],
+      "systems": ["closed", "semi", "open"], "styles": ["tropical_jungle", "ruins_postapo"],
+      "starter": false, "best_for": "vessels.jar_tall.best_for",
+      "image": null
+    },
+    {
+      "id": "vessel_bottle_5l", "slug": "bottle-5l", "shape": "bottle",
+      "name_ru": "Бутыль 5 л", "name_en": "5 L Carboy",
+      "dims_cm": { "diameter_cm": 18, "height_cm": 30 },
+      "volume_liters_label": 5, "volume_liters_approx": 5.0, "footprint_cm2_approx": 204,
+      "neck_diameter_cm": 6,
+      "closure_default": "sealable", "closure_options": ["sealable"],
+      "systems": ["closed", "semi", "open"], "styles": ["tropical_jungle", "taiga_wabikusa"],
+      "starter": false, "best_for": "vessels.bottle.best_for",
+      "image": null
+    },
+    {
+      "id": "vessel_sphere_hang", "slug": "sphere-hang", "shape": "sphere",
+      "name_ru": "Сфера подвесная", "name_en": "Hanging Sphere",
+      "dims_cm": { "diameter_cm": 18, "height_cm": 18 },
+      "volume_liters_approx": 2.6, "footprint_cm2_approx": 153,
+      "neck_diameter_cm": 5,
+      "closure_default": "sealable", "closure_options": ["sealable", "open_top"],
+      "systems": ["closed", "semi", "open"], "styles": ["minimal_modern"],
+      "starter": false, "best_for": "vessels.sphere.best_for",
+      "image": null
+    },
+    {
+      "id": "vessel_geo_house_7l", "slug": "geo-house-7l", "shape": "geo_house",
+      "name_ru": "Геометрический «домик»", "name_en": "Geometric House",
+      "dims_cm": { "width_cm": 20, "depth_cm": 20, "height_cm": 20 },
+      "volume_liters_approx": 7.2, "footprint_cm2_approx": 400,
+      "closure_default": "vented", "closure_options": ["vented", "open_top"],
+      "systems": ["semi", "open"], "styles": ["minimal_modern", "ruins_postapo"],
+      "starter": false, "best_for": "vessels.geo_house.best_for",
+      "image": null
+    },
+    {
+      "id": "vessel_cube_10l", "slug": "cube-10l", "shape": "cube",
+      "name_ru": "Куб / аквариум 10 л", "name_en": "10 L Cube",
+      "dims_cm": { "width_cm": 20, "depth_cm": 20, "height_cm": 25 },
+      "volume_liters_approx": 10.0, "footprint_cm2_approx": 400,
+      "closure_default": "vented", "closure_options": ["vented", "mesh", "open_top"],
+      "systems": ["semi", "open"], "styles": ["tropical_jungle", "forest_stream", "ruins_postapo"],
+      "starter": false, "best_for": "vessels.cube.best_for",
+      "image": null
+    },
+    {
+      "id": "vessel_tank_15l", "slug": "tank-15l", "shape": "tank",
+      "name_ru": "Палюдариум 15 л", "name_en": "15 L Paludarium Tank",
+      "dims_cm": { "width_cm": 30, "depth_cm": 20, "height_cm": 25 },
+      "volume_liters_approx": 15.0, "footprint_cm2_approx": 600,
+      "closure_default": "mesh", "closure_options": ["mesh", "vented", "open_top"],
+      "systems": ["semi", "open"], "styles": ["forest_stream", "tropical_jungle"],
+      "supports_open_water": true,
+      "starter": false, "best_for": "vessels.tank.best_for",
+      "image": null
+    }
+  ],
+  "recommendation": {
+    "mode": "choose",
+    "envelope_from_wishlist": {
+      "min_volume_liters": "max(volume_policy.hard_min для системы, max(min_volume растений по системе), max(min_volume фауны))",
+      "min_footprint_cm2": "max(Σ пятно upright_trailing / 0.8, Σ пятно groundcover / 0.9) по norms.planting",
+      "min_free_height_cm": "max(height_cm直立 растений); лианы и mount не учитываются",
+      "required_closure": "closed → sealable; semi → sealable|vented; open → любой",
+      "neck_preference": "если есть крупная фауна или частое обслуживание → wide"
+    },
+    "ranking": [
+      "1. Отфильтровать пресеты: systems ∋ выбранная система; volume ≥ min_volume; footprint ≥ min_footprint; closure совместим; free_height ≥ min_free_height (при малом объёме брать минимальную глубину субстрата).",
+      "2. Если supports_open_water требуется (has_open_water) — оставить только tank.",
+      "3. Сортировать по близости объёма к min_volume (меньший, но достаточный — выше), бонус starter:true.",
+      "4. Вернуть 2–3 пресета с обоснованием (i18n vessels.recommend.*): объём, площадь дна, крышка, высота."
+    ],
+    "no_fit": "Если ни один пресет не подходит — сообщить, какое ограничение не выполнено (объём / высота / крышка / вода), и предложить ближайший больший."
+  },
+  "ui": {
+    "silhouette_by_shape": { "bowl": "bowl", "jar": "jar", "cube": "cube", "bottle": "bottle", "sphere": "sphere", "geo_house": "geo_house", "tank": "tank" },
+    "note": "Силуэты — монохромные SVG/CSS на UI-этапе; фото тары не собираем."
+  }
+}
