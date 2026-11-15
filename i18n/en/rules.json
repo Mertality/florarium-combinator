@@ -1,5 +1,5 @@
 {
-  "meta": { "lang": "ru", "namespace": "rules", "schema_version": "1.0" },
+  "meta": { "lang": "en", "namespace": "rules", "schema_version": "1.0" },
   "rules": {
     "r_system_type_mismatch": { "msg": "{species} does not suit the selected system type ({system}).", "remedy": "Change the system type or replace the species with a compatible one." },
     "r_system_airflow_high": { "msg": "{species} needs constant fresh air and will die in a sealed jar.", "remedy": "Use a ventilated or open system, or replace the species." },
