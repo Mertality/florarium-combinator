@@ -1,0 +1,115 @@
+{
+  "meta": { "lang": "en", "namespace": "catalog", "merge": "flat", "schema_version": "1.0" },
+  "notes": {
+    "plant_leucobryum_glaucum": "Cushion moss, prefers acidic conditions. In closed systems needs an active springtail colony and periodic ventilation.",
+    "plant_dicranum_scoparium": "Cushion moss, prefers acidic conditions. In closed systems needs springtails and ventilation.",
+    "plant_polytrichum_commune": "Needs a cool winter rest.",
+    "plant_climacium_dendroides": "Tree-like moss. Needs a cool winter rest.",
+    "plant_nephrolepis": "In small volumes quickly hits the lid; needs trimming.",
+    "plant_adiantum": "Sensitive to drying out and direct rays.",
+    "plant_pellaea_rotundifolia": "Rock fern, light-loving. Not for sealed jars.",
+    "plant_davallia": "Furry rabbit-foot rhizomes creep over the surface.",
+    "plant_fittonia": "A classic for closed florariums. Pinch for compactness.",
+    "plant_pilea": "Can be aggressive in small volumes.",
+    "plant_peperomia": "Semi-succulent: dislikes waterlogging and leaf condensation.",
+    "plant_ficus_pumila": "Aggressive vine: covers everything in 2–3 months, trim regularly. Milky sap is toxic.",
+    "plant_soleirolia_soleirolii": "Very aggressive carpet: crowds out moss in 1–3 L jars.",
+    "plant_biophytum_sensitivum": "Leaves fold when touched. A mini palm.",
+    "plant_hypoestes_phyllostachya": "Quickly stretches upward; needs pinching.",
+    "plant_begonia_rex_etc": "Ventilated systems only. Dislikes leaf condensation.",
+    "plant_episcia": "Spreads by runners, quickly fills the volume.",
+    "plant_syngonium_pixie_neon": "Fast growth, needs training.",
+    "plant_calathea_maranta_ctenanthe": "Needs ventilation. Sensitive to hard water and dry air (spider mites).",
+    "plant_strobilanthes_dyerianus": "Large for small jars: hits the lid. Metallic purple under bright light.",
+    "plant_hydrocotyle": "Very fast carpet, loves wet substrate.",
+    "plant_pellionia": "Aggressive carpet.",
+    "plant_saxifraga_stolonifera": "Spreads by stolons.",
+    "plant_tradescantia": "Fast growth, easy to propagate from cuttings.",
+    "plant_callisia_repens": "Fast carpet.",
+    "plant_epipremnum_scindapsus": "Large vine for small jars. Toxic.",
+    "plant_philodendron": "Toxic.",
+    "plant_marcgravia": "Shingle leaves pressed to the mount. Closed warm systems only.",
+    "plant_monstera_obliqua_adansonii_mini": "Toxic. Fast growth.",
+    "plant_hedera_helix": "Temperate climate, needs wintering. Rots in sealed jars.",
+    "plant_ludisia_discolor": "The easiest jewel orchid.",
+    "plant_macodes_petola": "Needs stable humidity and warmth. Cannot tolerate condensation.",
+    "plant_anoectochilus": "Needs stable humidity and warmth. Cannot tolerate condensation.",
+    "plant_dossinia_marmorata": "Needs stable humidity and warmth. Cannot tolerate condensation.",
+    "plant_goodyera": "Temperate climate, needs a cool winter rest.",
+    "plant_mini_epiphytes_orchids": "Ventilated systems only, mounted on wood.",
+    "plant_tillandsia": "Atmospheric: no substrate. Soak 20–30 min every 1–2 weeks or mist 2–3 times a week.",
+    "plant_cryptanthus": "Moisture-loving bromeliad but cannot tolerate condensation.",
+    "plant_neoregelia": "Pour water into the rosette cup.",
+    "plant_guzmania_vriesea": "The rosette dies after flowering; keep the offsets.",
+    "plant_drosera": "Acid peat without fertilizer only, distilled water. Dew forms under bright light.",
+    "plant_pinguicula": "Sticky leaves catch gnats. Acid substrate, distilled water.",
+    "plant_dionaea_muscipula": "Open/semi-open only, bright sun, cool winter rest. Distilled water.",
+    "plant_nepenthes": "Needs a day/night drop for pitchers. Expert level.",
+    "plant_saintpaulia": "Dislikes leaf condensation.",
+    "plant_streptocarpus": "Dislikes leaf condensation.",
+    "plant_cyclamen_persicum_mini": "Cool winter rest. Toxic.",
+    "plant_fuchsia_mini": "Fast growth, cool winter rest.",
+    "plant_medinilla": "Large for small jars.",
+    "plant_haworthia": "Shade-tolerant succulent: can grow without a lamp, but slowly.",
+    "plant_gasteria": "Shade-tolerant succulent.",
+    "plant_echeveria": "Etiolates (stretches) without bright light.",
+    "plant_crassula": "Toxic. Stretches without bright light.",
+    "plant_sedum": "Stretches without bright light.",
+    "plant_kalanchoe": "Toxic. Stretches without bright light.",
+    "plant_aloe_mini": "Toxic. Stretches without bright light.",
+    "plant_rhipsalis": "Forest cactus: loves humidity, unlike desert cacti.",
+    "plant_hoya": "Semi-succulent vine. Cannot tolerate condensation.",
+    "plant_ceropegia_woodii": "String of hearts. Semi-succulent.",
+    "plant_dischidia": "Epiphyte, mounted on wood.",
+    "fauna_collembola": "Ecosystem foundation: eat mold and litter. Establish 1–2 weeks before planting.",
+    "fauna_trichorhina_tomentosa": "Dwarf isopods, do not burrow deep.",
+    "fauna_porcellionides_pruinosus_dwarf_purple": "Fast, may nibble tender shoots.",
+    "fauna_hypoaspis_miles": "Destroys fungus gnat larvae.",
+    "fauna_porcellio_laevis_dairy_cow": "Large (up to 2 cm). Needs feeding.",
+    "fauna_armadillidium_maculatum": "Large, decorative.",
+    "fauna_armadillidium_klugii": "Large, decorative.",
+    "fauna_cubaris_panda_king": "Slow, love humidity.",
+    "fauna_cubaris_rubber_ducky": "Slow, love humidity.",
+    "fauna_porcellio_scaber_orange_powder_orange": "Fast, decorative.",
+    "fauna_armadillidium_vulgare": "Rolls into a ball.",
+    "fauna_millipedes": "Burrow and mix layers. Release benzoquinones when stressed — do not combine with small fauna.",
+    "fauna_land_snails": "Pest: eats live plants, parthenogenetic (breeds without a mate).",
+    "fauna_earthworms": "Not recommended for closed systems: destroy layers and die.",
+    "fauna_entomopathogenic_nematodes": "Parasitize gnat larvae. Applied with watering."
+  },
+  "materials": {
+    "prep": {
+      "rinse": "Rinse off dust and dirt", "soak_3_5d": "Soak 3–5 days, changing the water", "soak_2_4w": "Soak 2–4 weeks, changing the water", "boil_or_bake": "Boil 20–30 min or bake in the oven", "file_edges": "File sharp chips smooth", "vinegar_test": "Drop vinegar: fizzing means carbonates", "isolate_from_soil": "Isolate from substrate (barrier/sealant) so it does not raise pH"
+    },
+    "stones": {
+      "granite": { "notes": "Inert, universal; smooth the chips." }, "basalt": { "notes": "Inert, dark; for taiga and jungle." }, "jasper": { "notes": "Possible carbonate veins — vinegar test." }, "slate": { "notes": "Flat layers for mountains; smooth sharp chips." }, "serpentinite": { "notes": "Test and soak; decorative green." }, "ohko": { "notes": "Dragon stone: rinse clay pockets, fragile." }, "volcanic": { "notes": "Porous lava: rinse dust, holds moisture." }, "river_pebbles": { "notes": "Smooth, safe for fauna; carbonate test." }, "quartz": { "notes": "Inert white; for minimalism and stream beds." }, "quartz_sand": { "notes": "Inert; paths, stream beds, top dressing." }, "brick": { "notes": "Only without mortar; soak, test." }, "terracotta": { "notes": "Soak; shards for ruins." }, "concrete": { "notes": "Strongly alkaline: isolate from substrate, neutral species only." }, "marble": { "notes": "Alkaline: only with succulents and tolerant species." }, "lemezit": { "notes": "Marbleized limestone: alkaline, not for moss or carnivores." }, "sea_pebbles": { "notes": "Possible shells — test; soak." }, "coquina": { "notes": "Shell limestone: alkaline, not for acid-lovers." }, "seiryu": { "notes": "Calcite veins raise pH/KH; test, not for moss." }, "travertine": { "notes": "Carbonate: alkaline; for ruins with neutral species." }, "zoisite": { "notes": "Possible carbonates — test." }, "petrified_wood": { "notes": "Petrified wood: inert, textured." }
+    },
+    "decor": {
+      "driftwood": { "notes": "Boil/bake; tannins slightly acidify. Mount for epiphytes." }, "cork_bark": { "notes": "Cork bark: mount for epiphytes, does not rot." }, "alder_cones": { "notes": "Alder cones: tannins, acidify, food for cleanup crew." }, "oak_litter": { "notes": "Oak litter: food for cleanup crew, refresh 4–8 weeks." }, "aged_wood": { "notes": "Aged wood: bake; for ruins." }
+    },
+    "substrates": {
+      "tropical": { "notes": "Light moisture-retentive mix for tropics; no fertilizer." }, "epiphytic": { "notes": "Bark and sphagnum for epiphytes; pockets and mounting." }, "carnivore_acid": { "notes": "High-moor peat without fertilizer plus perlite/quartz only; distilled water." }, "succulent_mineral": { "notes": "Mineral, fast-draining; for succulents." }, "moss_acid": { "notes": "Acid peat and sphagnum; for bog mosses." }
+    },
+    "components": {
+      "charcoal": { "notes": "Granular horticultural/wood charcoal, not pharmacy tablets." }, "peat_highmoor": { "notes": "High-moor acid peat WITHOUT fertilizer." }, "vermiculite": { "notes": "Not for carnivores: leaches minerals." }
+    }
+  },
+  "styles": {
+    "taiga_wabikusa": { "name": "Taiga / wabi-kusa", "mood": "Mossy forest: mounds, driftwood, asymmetry and height contrast.", "tips": "Dark stones (slate, granite, lava), moss carpet, one vertical accent. Avoid symmetry." },
+    "tropical_jungle": { "name": "Tropical jungle", "mood": "Dense greenery in 3+ layers, vines and epiphytes; no empty gaps.", "tips": "Carpet ≥50% of floor, bushes, vines on the background, epiphytes on wood. Ohko and lava stones." },
+    "iwagumi_rocky": { "name": "Iwagumi / rocks", "mood": "Mountain stones and low carpets; one stone type, at most 3 plants.", "tips": "One stone type, carpet ≥70%, no vines. The stone is the hero." },
+    "forest_stream": { "name": "Forest stream", "mood": "A path or stream between banks with ferns and mosses.", "tips": "Quartz sand and pebbles for the bed, ferns on the banks, sphagnum by the water." },
+    "ruins_postapo": { "name": "Ruins / post-apocalyptic", "mood": "Brick and concrete reclaimed by greenery; story and texture.", "tips": "Soak brick and terracotta, isolate concrete. Vines and carpet wrapping the ruins." },
+    "minimal_modern": { "name": "Minimal / modern", "mood": "Clean layers, geometry, 1–3 plants and one stone.", "tips": "One accent species, clean top dressing, no aggressive carpets or burrowing fauna." }
+  },
+  "vessels": {
+    "bowl_small": { "best_for": "Succulents and minimalism on a windowsill." }, "bowl_wide": { "best_for": "Succulent garden or stone composition." }, "jar_3l": { "best_for": "Closed classic: fittonia + moss + carpet." }, "jar_5l": { "best_for": "Mini jungle with fauna; height headroom." }, "jar_tall": { "best_for": "Vines and vertical accents; has height." }, "bottle": { "best_for": "Closed expert jar; plant with tweezers." }, "sphere": { "best_for": "Hanging micro build; micro species only." }, "geo_house": { "best_for": "Open or semi-open: tillandsia, succulents." }, "cube": { "best_for": "Jungle or forest stream; semi-open." }, "tank": { "best_for": "Paludarium: water + land." },
+    "recommend": { "volume": "Volume {volume} L fits (needs at least {min_volume} L).", "footprint": "Floor of {footprint} cm² fits your planting.", "closure": "The lid supports the selected system type.", "height": "Height above substrate is enough for the selected species.", "starter_bonus": "Starter size — convenient for a first jar.", "no_fit": "No vessel fits the build: lacking {constraint}. Choose a larger vessel." }
+  },
+  "norms": {
+    "condensation": { "normal": "light fogging in the morning, glass clear by noon", "over_sign": "large drops persist all day", "over_action": "leave the lid ajar 2–4 hours (overnight for heavy overwatering)", "under_sign": "no fogging, substrate lightening", "under_action": "add 30–50 ml water per 3 L and recheck after a day" },
+    "ventilation": { "closed_schedule": "1–2 hours a week with the lid ajar", "semi_schedule": "short daily airing or a mesh lid", "mold_prevention": "springtails and ventilation; charcoal removes odors but does not stop mold" },
+    "water": { "closed_initial_moistening": "substrate moist like a wrung-out sponge", "open_tropical_check": "top 1–2 cm dry — water at the roots", "carnivore_water_open": "1–2 cm tray constantly, distilled/RO/rain only", "carnivore_water_closed": "constantly moist, no standing water at the roots" },
+    "placement": { "north": "stable indirect light", "east_west": "bright indirect — ideal for most", "south_shaded": "the best spot for closed jars", "south_direct": "a closed jar will overheat — not allowed", "room_depth": "low light; most species need a lamp", "lamp_only": "level set by distance and hours" }
+  }
+}
