@@ -1,8 +1,7 @@
-/* ─── SVG PREVIEW (модуль, изолированно) ─── */
 .pv-host {
   position: relative;
-  background: var(--bg2, #f5efe4);
-  border: 1px solid var(--line, #e0d8c8);
+  background: var(--bg2);
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 6px;
   margin: 0 0 14px;
