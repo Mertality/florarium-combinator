@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "file": "data/materials.json",
+    "purpose": "Камни, декор, субстраты, компоненты. Единый каталог материалов для сборок и списка покупок.",
+    "locale": "Названия в карточках (name_ru/name_en), заметки и подготовка — i18n materials.<kind>.<id>.notes / materials.prep.<key>",
+    "image_schema": "file + photo_form + license; для generated author/source_url/attribution = null (не пишутся)",
+    "depends": ["criteria.json", "styles.json"],
+    "layer_order": ["drainage", "separator", "charcoal", "substrate", "top_dressing_optional"],
+    "note": "Высоты слоёв и дозы — в norms.json. Дренаж и уголь включаются в рецепт автоматически (нельзя убрать); для чисто-эпифитных сборок и водной зоны палюдариума — исключения в care_templates"
+  },
+  "prep_keys": ["rinse", "soak_3_5d", "soak_2_4w", "boil_or_bake", "file_edges", "vinegar_test", "isolate_from_soil"],
+  "stones": [
+    { "id": "granite", "slug": "granite", "name_ru": "Гранит", "name_en": "Granite", "ph_zones": ["acid", "slightly_acid", "neutral", "alkaline"], "ph_test_required": false, "sharp_edges": true, "prep": ["rinse", "file_edges"], "styles": ["taiga_wabikusa", "iwagumi_rocky", "forest_stream", "ruins_postapo", "minimal_modern"], "alternatives": [], "image": { "file": "img/granite.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "basalt", "slug": "basalt", "name_ru": "Базальт", "name_en": "Basalt", "ph_zones": ["acid", "slightly_acid", "neutral", "alkaline"], "ph_test_required": false, "sharp_edges": true, "prep": ["rinse", "file_edges"], "styles": ["taiga_wabikusa", "tropical_jungle", "forest_stream"], "alternatives": ["volcanic"], "image": { "file": "img/basalt.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "jasper", "slug": "jasper", "name_ru": "Яшма", "name_en": "Jasper", "ph_zones": ["acid", "slightly_acid", "neutral", "alkaline"], "ph_test_required": true, "sharp_edges": true, "prep": ["vinegar_test", "rinse", "file_edges"], "styles": ["iwagumi_rocky", "minimal_modern"], "alternatives": ["granite", "quartz"], "image": { "file": "img/jasper.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "slate", "slug": "slate", "name_ru": "Сланец", "name_en": "Slate", "ph_zones": ["acid", "slightly_acid", "neutral", "alkaline"], "ph_test_required": false, "sharp_edges": true, "prep": ["rinse", "file_edges"], "styles": ["iwagumi_rocky", "taiga_wabikusa", "ruins_postapo", "minimal_modern"], "alternatives": [], "image": { "file": "img/slate.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "serpentinite", "slug": "serpentinite", "name_ru": "Змеевик (серпентинит)", "name_en": "Serpentinite", "ph_zones": ["acid", "slightly_acid", "neutral", "alkaline"], "ph_test_required": true, "sharp_edges": false, "prep": ["vinegar_test", "soak_3_5d", "rinse"], "styles": ["iwagumi_rocky", "minimal_modern"], "alternatives": ["jasper", "slate"], "image": { "file": "img/serpentinite.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "ohko", "slug": "ohko", "name_ru": "Драконий камень (Ohko)", "name_en": "Dragon Stone (Ohko)", "ph_zones": ["acid", "slightly_acid", "neutral"], "ph_test_required": false, "sharp_edges": false, "fragile": true, "porous": true, "prep": ["rinse"], "styles": ["tropical_jungle", "taiga_wabikusa", "iwagumi_rocky"], "alternatives": ["volcanic"], "image": { "file": "img/Ohko.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "volcanic", "slug": "volcanic", "name_ru": "Вулканическая лава", "name_en": "Volcanic Lava Rock", "ph_zones": ["acid", "slightly_acid", "neutral", "alkaline"], "ph_test_required": false, "sharp_edges": true, "porous": true, "prep": ["rinse"], "styles": ["taiga_wabikusa", "tropical_jungle", "iwagumi_rocky"], "alternatives": ["basalt", "ohko"], "image": { "file": "img/volcanic.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "river_pebbles", "slug": "river-pebbles", "name_ru": "Речная галька", "name_en": "River Pebbles", "ph_zones": ["acid", "slightly_acid", "neutral", "alkaline"], "ph_test_required": false, "sharp_edges": false, "prep": ["rinse", "vinegar_test"], "styles": ["forest_stream", "iwagumi_rocky"], "alternatives": ["quartz"], "image": { "file": "img/river_pebbles.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "quartz", "slug": "quartz", "name_ru": "Кварц / белый кварц", "name_en": "Quartz / White Quartz", "ph_zones": ["acid", "slightly_acid", "neutral", "alkaline"], "ph_test_required": false, "sharp_edges": true, "prep": ["rinse", "file_edges"], "styles": ["forest_stream", "minimal_modern"], "alternatives": [], "image": { "file": "img/quartz.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "quartz_sand", "slug": "quartz-sand", "name_ru": "Кварцевый песок", "name_en": "Quartz Sand", "ph_zones": ["acid", "slightly_acid", "neutral", "alkaline"], "ph_test_required": false, "sharp_edges": false, "prep": ["rinse"], "styles": ["forest_stream", "iwagumi_rocky", "minimal_modern"], "alternatives": [], "image": { "file": "img/quartz_sand.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "brick", "slug": "brick", "name_ru": "Обожжённый кирпич", "name_en": "Fired Brick (no mortar)", "ph_zones": ["slightly_acid", "neutral", "alkaline"], "ph_test_required": true, "sharp_edges": true, "prep": ["soak_3_5d", "vinegar_test", "file_edges"], "styles": ["ruins_postapo"], "alternatives": ["terracotta"], "image": { "file": "img/brick.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "terracotta", "slug": "terracotta", "name_ru": "Терракота", "name_en": "Terracotta", "ph_zones": ["slightly_acid", "neutral", "alkaline"], "ph_test_required": true, "sharp_edges": true, "prep": ["soak_3_5d", "vinegar_test"], "styles": ["ruins_postapo"], "alternatives": ["brick"], "image": { "file": "img/terracotta.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "concrete", "slug": "concrete", "name_ru": "Бетон / цемент / старый кирпич с раствором", "name_en": "Concrete / Cement / Old Brick with Mortar", "ph_zones": ["neutral", "alkaline"], "ph_test_required": true, "alkalizing": true, "sharp_edges": true, "prep": ["soak_2_4w", "isolate_from_soil", "vinegar_test"], "styles": ["ruins_postapo"], "alternatives": ["brick", "terracotta"], "image": { "file": "img/concrete.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "marble", "slug": "marble", "name_ru": "Мрамор", "name_en": "Marble", "ph_zones": ["neutral", "alkaline"], "ph_test_required": false, "alkalizing": true, "sharp_edges": false, "prep": ["rinse"], "styles": ["minimal_modern"], "alternatives": ["quartz", "granite"], "image": { "file": "img/marble.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "lemezit", "slug": "lemezit", "name_ru": "Лемезит", "name_en": "Lemezit (Marbleized Limestone)", "ph_zones": ["neutral", "alkaline"], "ph_test_required": false, "alkalizing": true, "sharp_edges": true, "prep": ["rinse", "file_edges"], "styles": [], "alternatives": ["slate", "granite"], "image": { "file": "img/lemzit.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "sea_pebbles", "slug": "sea-pebbles", "name_ru": "Морская галька", "name_en": "Sea Pebbles", "ph_zones": ["neutral", "alkaline"], "ph_test_required": true, "alkalizing": true, "sharp_edges": false, "prep": ["vinegar_test", "soak_3_5d"], "styles": [], "alternatives": ["river_pebbles"], "image": { "file": "img/sea_pebbles.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "coquina", "slug": "coquina", "name_ru": "Ракушечник", "name_en": "Coquina (Shell Limestone)", "ph_zones": ["neutral", "alkaline"], "ph_test_required": false, "alkalizing": true, "sharp_edges": true, "porous": true, "prep": ["rinse", "file_edges"], "styles": [], "alternatives": ["river_pebbles", "quartz"], "image": { "file": "img/coquina.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "seiryu", "slug": "seiryu", "name_ru": "Сейрю", "name_en": "Seiryu Stone", "ph_zones": ["neutral", "alkaline"], "ph_test_required": true, "alkalizing": true, "sharp_edges": true, "prep": ["vinegar_test", "soak_3_5d", "file_edges"], "styles": ["iwagumi_rocky"], "alternatives": ["slate", "granite"], "image": { "file": "img/Seiryu.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "travertine", "slug": "travertine", "name_ru": "Травертин", "name_en": "Travertine", "ph_zones": ["neutral", "alkaline"], "ph_test_required": false, "alkalizing": true, "sharp_edges": true, "porous": true, "prep": ["rinse", "file_edges"], "styles": ["ruins_postapo"], "alternatives": ["brick", "granite"], "image": { "file": "img/travertine.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "zoisite", "slug": "zoisite", "name_ru": "Цоизит", "name_en": "Zoisite", "ph_zones": ["acid", "slightly_acid", "neutral", "alkaline"], "ph_test_required": true, "sharp_edges": true, "prep": ["vinegar_test", "rinse", "file_edges"], "styles": ["minimal_modern"], "alternatives": ["jasper"], "image": { "file": "img/zoisite.webp", "photo_form": "illustration", "license": "generated" } },
+    { "id": "petrified_wood", "slug": "petrified-wood", "name_ru": "Окаменелое дерево", "name_en": "Petrified Wood", "ph_zones": ["acid", "slightly_acid", "neutral", "alkaline"], "ph_test_required": false, "sharp_edges": true, "prep": ["rinse", "file_edges"], "styles": ["taiga_wabikusa", "ruins_postapo", "minimal_modern"], "alternatives": [], "image": { "file": "img/petrified_wood.webp", "photo_form": "illustration", "license": "generated" } }
+  ],
+  "decor": [
+    { "id": "driftwood", "slug": "driftwood", "name_ru": "Коряга", "name_en": "Driftwood", "ph_zones": ["acid", "slightly_acid", "neutral"], "prep": ["boil_or_bake"], "is_mount": true, "styles": ["taiga_wabikusa", "tropical_jungle", "forest_stream", "ruins_postapo"], "image": null },
+    { "id": "cork_bark", "slug": "cork-bark", "name_ru": "Пробковая кора", "name_en": "Cork Bark", "ph_zones": ["acid", "slightly_acid", "neutral"], "prep": ["boil_or_bake"], "is_mount": true, "styles": ["tropical_jungle", "taiga_wabikusa"], "image": null },
+    { "id": "alder_cones", "slug": "alder-cones", "name_ru": "Шишки ольхи", "name_en": "Alder Cones", "ph_zones": ["acid", "slightly_acid"], "prep": ["rinse", "boil_or_bake"], "is_feeding": true, "tannins": true, "styles": ["taiga_wabikusa", "forest_stream"], "image": null },
+    { "id": "oak_litter", "slug": "oak-litter", "name_ru": "Дубовый опад", "name_en": "Oak Leaf Litter", "ph_zones": ["acid", "slightly_acid", "neutral"], "prep": ["boil_or_bake"], "is_feeding": true, "tannins": true, "styles": ["taiga_wabikusa", "forest_stream", "ruins_postapo"], "image": null },
+    { "id": "aged_wood", "slug": "aged-wood", "name_ru": "Состаренная древесина", "name_en": "Aged Wood", "ph_zones": ["acid", "slightly_acid", "neutral"], "prep": ["boil_or_bake"], "is_mount": true, "styles": ["ruins_postapo"], "image": null }
+  ],
+  "substrates": [
+    {
+      "id": "tropical", "slug": "tropical", "name_ru": "Тропический лёгкий", "name_en": "Tropical Light Mix",
+      "ph_zones": ["slightly_acid", "neutral"], "depth_cm": [5, 7], "water_quality": "soft", "fertilizer_free": true,
+      "recipe": [ { "component": "peat_or_coco", "pct": 50 }, { "component": "perlite", "pct": 20 }, { "component": "sphagnum", "pct": 10 }, { "component": "charcoal", "pct": 10 }, { "component": "pine_bark", "pct": 10 } ]
+    },
+    {
+      "id": "epiphytic", "slug": "epiphytic", "name_ru": "Эпифитный (кора и сфагнум)", "name_en": "Epiphytic Bark Mix",
+      "ph_zones": ["slightly_acid"], "depth_cm": [2, 4], "water_quality": "soft", "fertilizer_free": true, "mount_ok": true,
+      "recipe": [ { "component": "pine_bark", "pct": 50 }, { "component": "sphagnum", "pct": 30 }, { "component": "coco_chips", "pct": 10 }, { "component": "charcoal", "pct": 10 } ]
+    },
+    {
+      "id": "carnivore_acid", "slug": "carnivore-acid", "name_ru": "Кислый для хищников", "name_en": "Carnivorous Acid Mix",
+      "ph_zones": ["acid"], "depth_cm": [5, 8], "water_quality": "distilled_only", "fertilizer_free": true,
+      "forbidden_components": ["vermiculite", "fertilizer", "mineral_additives"],
+      "recipe": [ { "component": "peat_highmoor", "pct": 50 }, { "component": "perlite_or_quartz_sand", "pct": 50 } ],
+      "optional_top": "sphagnum"
+    },
+    {
+      "id": "succulent_mineral", "slug": "succulent-mineral", "name_ru": "Минеральный для суккулентов", "name_en": "Succulent Mineral Mix",
+      "ph_zones": ["slightly_acid", "neutral"], "depth_cm": [3, 5], "water_quality": "any", "fertilizer_free": true,
+      "recipe": [ { "component": "coarse_sand", "pct": 50 }, { "component": "peat_or_coco", "pct": 25 }, { "component": "perlite", "pct": 25 } ],
+      "alt_recipe": [ { "component": "pumice_lava_zeolite", "pct": 65 }, { "component": "coarse_sand", "pct": 20 }, { "component": "peat_or_coco", "pct": 15 } ]
+    },
+    {
+      "id": "moss_acid", "slug": "moss-acid", "name_ru": "Кислый для мхов", "name_en": "Acid Moss Mix",
+      "ph_zones": ["acid", "slightly_acid"], "depth_cm": [1, 2], "water_quality": "soft", "fertilizer_free": true,
+      "recipe": [ { "component": "peat_highmoor", "pct": 70 }, { "component": "perlite", "pct": 15 }, { "component": "sphagnum", "pct": 15 } ],
+      "optional_top": "sphagnum"
+    }
+  ],
+  "components": [
+    { "id": "peat_highmoor", "name_ru": "Верховой кислый торф (без удобрений)", "name_en": "Sphagnum Peat (fertilizer-free)", "fraction_mm": null, "prep": ["rinse"], "ph_inert": false },
+    { "id": "peat_or_coco", "name_ru": "Торф или кокосовое волокно", "name_en": "Peat or Coco Coir", "fraction_mm": null, "prep": ["rinse"], "ph_inert": false },
+    { "id": "perlite", "name_ru": "Перлит", "name_en": "Perlite", "fraction_mm": [2, 5], "prep": ["rinse"], "ph_inert": true },
+    { "id": "vermiculite", "name_ru": "Вермикулит", "name_en": "Vermiculite", "fraction_mm": [2, 4], "prep": [], "ph_inert": true, "forbidden_in": ["carnivore_acid"] },
+    { "id": "pine_bark", "name_ru": "Сосновая кора", "name_en": "Pine Bark", "fraction_mm": [5, 10], "prep": ["boil_or_bake"], "ph_inert": false },
+    { "id": "coco_chips", "name_ru": "Кокосовые чипсы", "name_en": "Coco Chips", "fraction_mm": [10, 20], "prep": ["rinse", "soak_3_5d"], "ph_inert": false },
+    { "id": "sphagnum", "name_ru": "Сфагнум (сухой или живой)", "name_en": "Sphagnum Moss", "fraction_mm": null, "prep": ["rinse"], "ph_inert": false },
+    { "id": "charcoal", "name_ru": "Уголь древесный гранулированный (без добавок)", "name_en": "Horticultural Charcoal", "fraction_mm": [3, 8], "prep": ["rinse"], "ph_inert": true, "note": "не аптечные таблетки" },
+    { "id": "coarse_sand", "name_ru": "Крупный песок", "name_en": "Coarse Sand", "fraction_mm": [2, 4], "prep": ["rinse"], "ph_inert": true },
+    { "id": "perlite_or_quartz_sand", "name_ru": "Перлит или кварцевый песок (промытый, некарбонатный)", "name_en": "Perlite or Washed Quartz Sand", "fraction_mm": [1, 3], "prep": ["rinse", "vinegar_test"], "ph_inert": true },
+    { "id": "pumice_lava_zeolite", "name_ru": "Пемза / лава / цеолит", "name_en": "Pumice / Lava / Zeolite", "fraction_mm": [3, 8], "prep": ["rinse"], "ph_inert": true },
+    { "id": "leca", "name_ru": "Керамзит (дренаж)", "name_en": "Expanded Clay (drainage)", "fraction_mm": [3, 8], "prep": ["rinse"], "ph_inert": true },
+    { "id": "mesh_separator", "name_ru": "Сетка-разделитель", "name_en": "Mesh Separator", "fraction_mm": null, "prep": ["rinse"], "ph_inert": true }
+  ],
+  "drainage": {
+    "allowed": ["leca", "pumice_lava_zeolite", "river_pebbles"],
+    "removed_from_old_memo": ["brick", "coarse_sand"],
+    "note": "Кирпич и песок исключены из дренажа (памятка по камням / ревью почв). Песок — компонент смеси, не дренаж."
+  },
+  "top_dressing": {
+    "allowed": ["quartz_sand", "granite_crushed", "sphagnum", "river_pebbles"],
+    "forbidden_over_acidophiles": ["marble", "lemezit", "coquina", "travertine", "sea_pebbles"],
+    "note": "Запрет обеспечивается pH-моделью автоматически; список — для подсказок"
+  }
+}
