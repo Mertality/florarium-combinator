@@ -1,0 +1,153 @@
+{
+  "meta": { "lang": "en", "namespace": "diag", "schema_version": "1.0" },
+  "mold_white_fuzz": {
+    "name": "White or grey fuzzy growth (mold)",
+    "cause": { "overwater_stagnant": "Overwatering and stagnant air: spores thrive on damp organic matter.", "poor_airflow": "Poor ventilation: humid stale air is ideal for mold.", "decaying_leaves": "Fallen leaves and food leftovers rot and feed mold." },
+    "fix": { "overwater_stagnant": "Remove affected substrate and leaves with tweezers, air the jar 2–4 hours, reduce watering. Repeat until the growth is gone.", "poor_airflow": "Air 1–2 hours weekly; for heavy growth leave the lid ajar overnight.", "decaying_leaves": "Remove all dead organic matter with tweezers and let the substrate dry slightly." },
+    "prev": { "overwater_stagnant": "Springtails, regular airing, charcoal in the substrate, do not overwater.", "poor_airflow": "Keep an airing schedule; do not place the jar in a still-air niche.", "decaying_leaves": "Remove litter regularly; keep springtails — they eat organics faster than mold." }
+  },
+  "white_dry_crust": {
+    "name": "White dry crust on glass and substrate",
+    "cause": { "hard_water_salts": "These are hard-water salts, not mold: water evaporates and calcium remains." },
+    "fix": { "hard_water_salts": "Wipe the glass with a soft cloth and a drop of vinegar, rinse. Switch to soft or distilled water." },
+    "prev": { "hard_water_salts": "Water with soft water; mist with distilled only." }
+  },
+  "sour_smell": {
+    "name": "Sour smell from the jar",
+    "cause": { "acidification": "The substrate turns sour: organics decompose without oxygen, often due to missing drainage." },
+    "fix": { "acidification": "Air and dry the substrate; for a strong smell replace the substrate and add drainage with charcoal." },
+    "prev": { "acidification": "2–4 cm drainage plus charcoal; do not overwater; springtails." }
+  },
+  "rotten_egg_smell": {
+    "name": "Rotten-egg smell (hydrogen sulphide)",
+    "cause": { "anaerobic": "Anaerobic zone: water stands in the drainage, oxygen is excluded, rot releases hydrogen sulphide." },
+    "fix": { "anaerobic": "Drain the standing water immediately, air the jar, remove rotting parts; in severe cases restart with fresh drainage." },
+    "prev": { "anaerobic": "Never let water stand in the drainage; keep a separator between drainage and substrate." }
+  },
+  "soil_cemented": {
+    "name": "Substrate crusted over",
+    "cause": { "fine_sand": "Fine sand or a dense mix: particles cake together and roots cannot breathe." },
+    "fix": { "fine_sand": "Gently loosen the top layer and mix in perlite; for a hard crust replace the substrate." },
+    "prev": { "fine_sand": "Coarse 2–4 mm sand, perlite in the recipe, avoid fine quarry sand." }
+  },
+  "roots_surface": {
+    "name": "Roots coming to the surface",
+    "cause": { "dense_soil": "The substrate is too dense or sour — roots lack air at depth." },
+    "fix": { "dense_soil": "Loosen the substrate, add perlite or bark; check the drainage." },
+    "prev": { "dense_soil": "Airy substrate per recipe, drainage, springtails." }
+  },
+  "wilt_wet": {
+    "name": "Plant wilts but the substrate is wet",
+    "cause": { "root_rot": "Root rot from overwatering: roots have rotted and cannot drink even though water is plentiful." },
+    "fix": { "root_rot": "Dry the substrate urgently, air the jar, remove rotting stems and roots; in severe cases replant the healthy part in fresh substrate." },
+    "prev": { "root_rot": "Water by substrate condition, drainage, never mix moisture-lovers with succulents." }
+  },
+  "wilt_dry": {
+    "name": "Plant wilts and the substrate is dry",
+    "cause": { "underwater": "Underwatering: roots have dried out and turgor is lost." },
+    "fix": { "underwater": "Water little by little and let it soak in; in a sealed jar add small doses and recheck condensation after a day." },
+    "prev": { "underwater": "Check the substrate regularly; in open systems water when the top layer dries." }
+  },
+  "green_film": {
+    "name": "Green film on substrate and glass (algae)",
+    "cause": { "algae": "Excess moisture and light: algae grow on wet illuminated surfaces." },
+    "fix": { "algae": "Scrape the film off, dry the top layer, shade from direct light, reduce watering." },
+    "prev": { "algae": "Balance light and moisture; springtails eat algae; do not overwater." }
+  },
+  "fungus_gnats": {
+    "name": "Tiny flying gnats (fungus gnats)",
+    "cause": { "overwater_organic": "Overwatering and rotting organics: larvae live in wet substrate." },
+    "fix": { "overwater_organic": "Dry the substrate and air the jar; add predatory mites (Hypoaspis) or nematodes (Steinernema) against larvae; yellow sticky traps for adults." },
+    "prev": { "overwater_organic": "Do not overwater, remove litter, keep predatory mites." }
+  },
+  "leggy_pale": {
+    "name": "Leggy stems, pale leaves",
+    "cause": { "low_light": "Not enough light: the plant stretches toward the source and loses pigment and shape." },
+    "fix": { "low_light": "Move to a brighter spot or run a grow light 10–14 hours a day." },
+    "prev": { "low_light": "Match species to your spot (north and deep room = lamp); do not put light-lovers in shade." }
+  },
+  "soft_rotting_stems": {
+    "name": "Soft rotting stems",
+    "cause": { "root_rot": "Rot from overwatering and stagnation: tissues soften and the stem blackens at the base." },
+    "fix": { "root_rot": "Cut affected stems back to healthy tissue, dry the substrate, air the jar; dust cuts with charcoal." },
+    "prev": { "root_rot": "Drainage, moderate watering, ventilation; leaves must not touch wet glass." }
+  },
+  "spider_mites": {
+    "name": "Spider mites (fine webbing, stippled leaves)",
+    "cause": { "dry_air": "Dry air: mites breed below 50% humidity, especially on calathea." },
+    "fix": { "dry_air": "Isolate the jar, rinse the leaves, raise humidity; for heavy infestation use an acaricide or predatory mites (Phytoseiulus)." },
+    "prev": { "dry_air": "Keep humidity 60%+, mist, keep away from radiators." }
+  },
+  "whiteflies": {
+    "name": "Whiteflies (tiny white flies)",
+    "cause": { "temperate_warm": "Warm stale air: whiteflies love temperate plants kept hot (fuchsia, ivy)." },
+    "fix": { "temperate_warm": "Remove affected leaves, air and cool, yellow traps; for heavy infestation an insecticide or Encarsia." },
+    "prev": { "temperate_warm": "Do not keep temperate species hot, ventilate, quarantine new plants." }
+  },
+  "scale_insects": {
+    "name": "Scale insects (brown bumps on stems)",
+    "cause": { "stagnant_air": "Stagnant air and weakened plants: scale settles on ivy and firm stems." },
+    "fix": { "stagnant_air": "Remove bumps with an alcohol-dipped cotton swab, air the jar; for heavy infestation a systemic insecticide." },
+    "prev": { "stagnant_air": "Ventilation, quarantine, inspect new plants." }
+  },
+  "springtails_on_glass": {
+    "name": "Springtails massing on the glass",
+    "cause": { "overwater_exit": "Overwatering: the substrate is waterlogged and springtails escape to the glass and surface." },
+    "fix": { "overwater_exit": "Dry the substrate, air the jar, drain excess water from the drainage." },
+    "prev": { "overwater_exit": "Calibrate moisture by condensation; do not overwater." }
+  },
+  "isopod_explosion": {
+    "name": "Isopod population explosion",
+    "cause": { "overfeeding": "Too much food: the population grows to match available organics." },
+    "fix": { "overfeeding": "Cut back feeding, remove leftovers; trap and relocate some isopods." },
+    "prev": { "overfeeding": "Feed small portions on schedule, use a feeding station." }
+  },
+  "springtail_crash": {
+    "name": "Springtails died off or vanished",
+    "cause": { "dryout": "Drying out: springtails need a moist environment and die in dry substrate." },
+    "fix": { "dryout": "Moisten the substrate, add a damp pocket (sphagnum); establish a new colony." },
+    "prev": { "dryout": "Do not keep springtails in dry succulent builds; maintain moist zones." }
+  },
+  "planaria_hydra": {
+    "name": "Planaria or hydra in open water",
+    "cause": { "open_water_overfeed": "Overfeeding and organics in the water: planaria and hydra breed in nutrient-rich paludarium water." },
+    "fix": { "open_water_overfeed": "Cut feeding, siphon the water, change 20–30% weekly; for outbreaks use traps or dedicated treatments." },
+    "prev": { "open_water_overfeed": "Do not overfeed, regular water changes, filter or aquatic plants." }
+  },
+  "condensation_all_day": {
+    "name": "Heavy condensation all day",
+    "cause": { "overwater": "Overwatering: more moisture than the ecosystem can cycle." },
+    "fix": { "overwater": "Leave the lid ajar 2–4 hours; if it persists leave it overnight and repeat until normal." },
+    "prev": { "overwater": "Calibrate moisture at setup; water in small doses." }
+  },
+  "no_condensation": {
+    "name": "No condensation at all",
+    "cause": { "underwater": "Underwatering or too dry: not enough moisture to cycle." },
+    "fix": { "underwater": "Add water in small doses (30–50 ml per 3 L) and recheck after a day." },
+    "prev": { "underwater": "Check condensation in the morning; if it dries out often, check the lid seal." }
+  },
+  "etiolation_succulent": {
+    "name": "Succulent stretching and paling",
+    "cause": { "low_light": "Too little light: echeveria and sedum stretch and lose rosette shape and colour." },
+    "fix": { "low_light": "Move to a south window or a grow light 12–14 h; the stretched top can be cut and rooted." },
+    "prev": { "low_light": "Succulents only in a bright spot or with a lamp; never in shade." }
+  },
+  "moss_browning": {
+    "name": "Moss browning or yellowing",
+    "cause": { "hard_water": "Hard water and carbonates: calcifuge mosses suffer from salts and alkaline pH." },
+    "fix": { "hard_water": "Switch to distilled or RO, remove carbonate stones, rinse the moss with soft water." },
+    "prev": { "hard_water": "Soft water, acid substrate, no marble or shell limestone." }
+  },
+  "leaves_on_glass_rot": {
+    "name": "Leaves rotting against the glass",
+    "cause": { "touch_wet_glass": "Leaves touch wet glass: constant contact with condensation causes rot." },
+    "fix": { "touch_wet_glass": "Move plants away from the glass, remove rotting leaves, air the jar." },
+    "prev": { "touch_wet_glass": "Do not overcrowd, leave a gap at the glass, ventilate." }
+  },
+  "bromeliad_cup_rot": {
+    "name": "Rot in the bromeliad cup",
+    "cause": { "stagnant_cup": "Water stagnates in the rosette: it turns foul in a warm closed system." },
+    "fix": { "stagnant_cup": "Flush the cup with clean soft water, drain the old water, air the jar; remove rotting leaves if present." },
+    "prev": { "stagnant_cup": "Flush the cup periodically, do not let water stagnate, ventilate." }
+  }
+}
