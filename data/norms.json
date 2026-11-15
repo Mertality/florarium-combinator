@@ -1,12 +1,18 @@
 {
   "meta": {
-    "schema_version": "1.0",
+    "schema_version": "1.1",
     "file": "data/norms.json",
-    "purpose": "Все числовые нормы комбинатора: геометрия тары, слои, свет, посадка, полив, фауна, обслуживание. Единое место для верификации чисел.",
-    "status": "DRAFT — числа с draft:true являются экспертной оценкой и требуют проверки.",
+    "purpose": "Все числовые нормы комбинатора. Единое место для верификации чисел.",
+    "status": "DRAFT — числа с draft:true требуют проверки опытом.",
     "locale": "Тексты подсказок — i18n norms.<section>.<key>",
     "depends": ["criteria.json", "materials.json", "styles.json", "plants_fauna.json"],
-    "principle": "Пер-видовые значения живут в карточках; здесь — глобальные дефолты и коэффициенты."
+    "changelog": [
+      "1.1: бакетная модель посадки (upright_trailing / groundcover / mount) вместо единой площади; habit вычисляется из layer_form, новые поля в карточках не нужны",
+      "1.1: fill 0.8, micro 16 см², aggressive ×2.0",
+      "1.1: south_shaded overheat_risk=false; room_depth остаётся shade-only + примечание",
+      "1.1: вода хищников разделена open/closed; формула дренажа clamp(20% высоты, 1.5, 4)",
+      "1.1: PPFD уточнён как ориентир для LED-досветки; конденсат — можно оставить на ночь; заметка о коммерческих упаковках коллембол"
+    ]
   },
   "geometry": {
     "volume_formulas": {
@@ -33,24 +39,24 @@
     "draft": true
   },
   "layers": {
-    "drainage": { "min_cm": 2, "max_cm": 4, "max_height_fraction": 0.2, "materials": ["leca", "pumice_lava_zeolite", "river_pebbles"] },
-    "separator": { "thickness_cm": 0.3, "materials": ["mesh_separator", "sphagnum"], "note": "предотвращает осыпание грунта в дренаж" },
+    "drainage": { "formula": "clamp(height_cm × 0.2, 1.5, 4)", "min_cm": 1.5, "max_cm": 4, "materials": ["leca", "pumice_lava_zeolite", "river_pebbles"], "note": "в высокой бутылке не больше 4 см, в мелкой плошке не меньше 1.5 см" },
+    "separator": { "thickness_cm": 0.3, "materials": ["mesh_separator", "sphagnum"] },
     "charcoal": { "dose_ml_per_liter": 15, "thickness_cm": [0.5, 1], "material": "charcoal", "recommended_in": ["closed", "semi"], "optional_in": ["open"] },
     "substrate_depth_ref": "materials.substrates[].depth_cm",
     "top_dressing": { "thickness_cm": [0.5, 1], "optional": true },
     "exceptions": {
-      "epiphyte_only_build": "если все растения habitat=epiphyte и ярус mount — субстрат и дренаж не обязательны (хардскейп)",
+      "epiphyte_only_build": "все растения mount — субстрат и дренаж не обязательны (хардскейп)",
       "paludarium_water_zone": "в водной зоне уголь и дренаж не кладутся; пирог только на суше"
     },
     "draft": true
   },
   "placement_map": {
-    "north": { "light": ["shade", "bright_indirect"], "overheat_risk": false, "note": "северное окно, стабильный рассеянный свет" },
-    "east_west": { "light": ["bright_indirect"], "overheat_risk": false, "note": "восток/запад, яркий рассеянный — идеал для большинства" },
-    "south_shaded": { "light": ["bright_indirect", "sun"], "overheat_risk": true, "note": "южное с притенением (тюль или отступ 1 м)" },
-    "south_direct": { "light": ["sun"], "overheat_risk": true, "note": "южное без притенения; закрытая банка = перегрев (block)" },
-    "room_depth": { "light": ["shade"], "overheat_risk": false, "note": "глубина комнаты >2 м от окна; большинству мало света" },
-    "lamp_only": { "light": ["shade", "bright_indirect", "sun"], "overheat_risk": false, "note": "фитолампа: уровень регулируется расстоянием и часами", "sets_has_grow_light": true }
+    "north": { "light": ["shade", "bright_indirect"], "overheat_risk": false, "note": "северное окно, стабильный рассеянный" },
+    "east_west": { "light": ["bright_indirect"], "overheat_risk": false, "note": "восток/запад — идеал для большинства" },
+    "south_shaded": { "light": ["bright_indirect", "sun"], "overheat_risk": false, "note": "юг с тюлем или отступом 1 м — лучшее место для закрытых банок" },
+    "south_direct": { "light": ["sun"], "overheat_risk": true, "note": "юг без притенения; закрытая банка = перегрев (block)" },
+    "room_depth": { "light": ["shade"], "overheat_risk": false, "note": ">2 м от окна; у южного окна может быть светлее — при сомнении выбирайте лампу" },
+    "lamp_only": { "light": ["shade", "bright_indirect", "sun"], "overheat_risk": false, "sets_has_grow_light": true, "note": "уровень регулируется расстоянием и часами" }
   },
   "light_norms": {
     "photoperiod_hours": { "shade": [8, 10], "bright_indirect": [10, 12], "sun": [12, 14] },
@@ -59,20 +65,28 @@
     "lux_approx": { "shade": [2000, 5000], "bright_indirect": [5000, 15000], "sun": [15000, 40000] },
     "led_distance_cm": [15, 30],
     "draft": true,
-    "note": "PPFD/lux — черновые ориентиры для подбора лампы, не измерение."
+    "note": "Ориентиры для светодиодной досветки, НЕ для прямого солнца (летом у южного окна PPFD 1000+)."
   },
   "planting": {
-    "footprint_cm2_per_size": { "micro": 25, "mini": 100, "large": 225 },
-    "footprint_note": "micro 5×5, mini 10×10, large 15×15 см",
-    "capacity_fill_factor": 0.7,
-    "aggressive_multiplier": 1.5,
-    "min_spacing_cm": 2,
+    "habit_from_layer_form": {
+      "priority": ["mount_only → mount", "includes bush|accent → upright", "includes vine → trailing", "carpet_only → groundcover"],
+      "note": "вычисляется из layer_form карточки; отдельное поле в каталоге не создаём"
+    },
+    "footprint_cm2_per_size": { "micro": 16, "mini": 100, "large": 225 },
+    "footprint_note": "micro 4×4, mini 10×10, large 15×15 см",
+    "aggressive_multiplier": 2.0,
+    "buckets": {
+      "upright_trailing": { "fill_factor": 0.8, "warn_above": 1.0, "block_above": 1.25, "note": "кусты, акценты и лианы делят дно" },
+      "groundcover": { "fill_factor": 0.9, "warn_above": 1.0, "block_above": 1.25, "note": "ковры растут под кустами, но конкурируют между собой" },
+      "mount": { "fill_factor": 0, "note": "дно не занимают; нужен хардскейп (r_epiphyte_mount)" }
+    },
+    "capacity_rule": "для каждого бакета: Σ пятно(size) × (aggressive ? 2 : 1) / (footprint × fill_factor); > warn_above → r_overcrowding, > block_above → r_overcrowding_hard",
+    "style_target_note": "styles.capacity_target применяется к бакету upright_trailing",
     "draft": true
   },
   "hardscape": {
     "stone_footprint_cm2": { "small": 30, "medium": 80, "large": 150 },
     "decor_footprint_cm2": { "driftwood": 100, "cork_bark": 60, "litter_scatter": 20 },
-    "note": "оценка для style-проверки hardscape_share_min; размер камня можно задать",
     "draft": true
   },
   "water": {
@@ -82,13 +96,14 @@
     "open_tropical_check": "верхний слой 1–2 см подсох → полить под корень",
     "open_tropical_interval_weeks": [1, 3],
     "open_succulent_interval_weeks": [2, 4],
-    "carnivore_water": "только дистиллят/осмос/дождевая; поддон 1–2 см постоянно",
+    "carnivore_water_open": "поддон 1–2 см постоянно, только дистиллят/осмос/дождевая",
+    "carnivore_water_closed": "грунт постоянно влажный, но без стоячей воды на уровне корней",
     "draft": true
   },
   "condensation": {
     "closed_normal": "лёгкое запотевание утром, к полудню стекло чистое",
     "overwater_sign": "крупные капли весь день",
-    "overwater_action": "приоткрыть крышку на 2–4 ч, повторять до нормы",
+    "overwater_action": "приоткрыть на 2–4 ч; при сохранении конденсата повторить или оставить приоткрытой на ночь",
     "underwater_sign": "нет запотевания + грунт светлеет",
     "underwater_action": "добавить воду малыми дозами (water.closed_calibration_dose), перепроверить через сутки"
   },
@@ -98,10 +113,11 @@
     "mold_prevention": "коллемболы + вентиляция; уголь адсорбирует запахи, но не останавливает плесень"
   },
   "fauna_defaults": {
-    "starter_ref": "plants_fauna.fauna[].starter_count (пер-видовые, черновик)",
+    "starter_ref": "plants_fauna.fauna[].starter_count",
+    "starter_note": "стартовое число — минимум; коммерческая упаковка коллембол обычно 100+ особей, это нормально",
     "feeding_interval_ref": "plants_fauna.fauna[].feeding_plan.interval_days",
-    "nematode_dosing": "по инструкции производителя (миллионы особей на упаковку); числом в базе не задаётся",
-    "calcium_note": "сепия/кальций локально на кормовом столике, не в кислый грунт (r_calcium_vs_acid)",
+    "nematode_dosing": "по инструкции производителя (миллионы особей); числом в базе не задаётся",
+    "calcium_note": "кальций локально на кормовом столике, не в кислый грунт (r_calcium_vs_acid)",
     "cleanup_crew_lead_time_weeks": [1, 2],
     "draft": true
   },
@@ -119,13 +135,10 @@
     "wintering_temp_c": { "cool_winter": [10, 15], "dry_winter": [12, 18] }
   },
   "verification_checklist": [
-    "geometry: коэффициенты объёма/дна по формам (особенно bowl / sphere / bottle)",
-    "layers: дренаж 2–4 см и ≤20% высоты, уголь 15 мл/л",
-    "placement_map: какой свет даёт каждое место и где риск перегрева",
-    "light_norms: фотопериод и PPFD по уровням",
-    "planting: пятна 25/100/225 см², заполнение 70%, агрессор ×1.5",
-    "water: калибровка 30–50 мл на 3 л, интервалы открытых систем",
-    "fauna: стартовые колонии в карточках (коллемболы 20–50, мокрицы 10–20 и т.д.)",
-    "seasonal: месяцы зимовки и температуры"
+    "planting: бакеты 0.8/0.9, micro 16, агрессор ×2 — проверить на своих сборках",
+    "placement_map: свет по местам, перегрев только south_direct",
+    "water: калибровка 30–50 мл/3 л, хищники open/closed",
+    "fauna: стартовые колонии в карточках",
+    "seasonal: месяцы и температуры зимовки"
   ]
 }
