@@ -3,19 +3,34 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const DATA=['criteria','styles','materials','plants_fauna','norms','vessels','care_templates','diagnostics'];
 const NS=['ui','rules','care','diag','catalog'];
 const DB={},I18N={ru:{},en:{}};
-let lang=localStorage.getItem('flor.lang')||'ru',D=null,dragIdx=null,prevBlockCount=0;
-const state={view:'builder',jarTab:'build',vessel:{preset:'vessel_jar_3l',shape:'jar',diameter:14,height:20,width:20,depth:20,neck:null,closure:'sealable',volumeLabel:null},system:'closed',placement:'east_west',water:'soft',experience:'beginner',style:'tropical_jungle',flags:{grow:false,winter:false,water:false},items:[],stones:[],decor:[],substrate:null,filters:{tab:'plants',group:'all',q:'',sort:'name',onlyCompatible:true}};
+let lang='ru',D=null,PRESETS=[],dragIdx=null,prevBlocks=0,booted=false;
+const TABS=['build','plants','fauna','setup','care'];
+const state={tab:'build',buildTab:'composition',careTab:'sheet',
+  vessel:{preset:'vessel_jar_3l',shape:'jar',diameter:14,height:20,width:20,depth:20,neck:null,closure:'sealable',volumeLabel:null},
+  system:'closed',placement:'east_west',water:'soft',experience:'beginner',style:'tropical_jungle',
+  flags:{grow:false,winter:false,water:false},items:[],stones:[],decor:[],substrate:null,
+  filters:{plants:{group:'all',q:'',sort:'name',only:true},fauna:{group:'all',q:'',sort:'name',only:true}}};
 const FL={air_humidity:{ru:'Влажность воздуха',en:'Air humidity'},soil_humidity:{ru:'Влажность грунта',en:'Soil moisture'},substrate:{ru:'Субстрат',en:'Substrate'},light:{ru:'Свет',en:'Light'},temperature:{ru:'Температура',en:'Temperature'}};
-
+const ICON={
+  build:'<svg viewBox="0 0 24 24" class="ic"><path d="M8 3h8M9 3v3.2C9 8 6 9.6 6 13v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6c0-3.4-3-5-3-6.8V3"/><path d="M6.5 16h11"/></svg>',
+  plants:'<svg viewBox="0 0 24 24" class="ic"><path d="M12 21c5-3 8-7 8-12-5 0-9 3-12 8"/><path d="M12 21C7 18 4 14 4 9c5 0 9 3 12 8"/></svg>',
+  fauna:'<svg viewBox="0 0 24 24" class="ic"><ellipse cx="12" cy="13" rx="6" ry="5"/><path d="M12 8V5M9 5.5 7.5 3.5M15 5.5 16.5 3.5M6 11 3 9.5M6 15l-3 1.5M18 11l3-1.5M18 15l3 1.5"/></svg>',
+  setup:'<svg viewBox="0 0 24 24" class="ic"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h9M17 17h3"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="15" cy="17" r="2"/></svg>',
+  care:'<svg viewBox="0 0 24 24" class="ic"><path d="M5 4h9l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M14 4v5h5M8 13h7M8 17h5"/></svg>',
+  moon:'<svg viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>',
+  sun:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>',
+  search:'<svg viewBox="0 0 24 24" class="ic"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  x:'<svg viewBox="0 0 24 24" class="ic"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" class="ic"><path d="m9 5 7 7-7 7"/></svg>',
+  dice:'<svg viewBox="0 0 24 24" class="ic"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8.5" cy="8.5" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="15.5" cy="15.5" r="1.1"/></svg>',
+  leaf:'<svg viewBox="0 0 24 24"><path d="M12 21c5-3 8-7 8-12-5 0-9 3-12 8"/><path d="M12 21C7 18 4 14 4 9c5 0 9 3 12 8"/></svg>'
+};
 const L=(k,ru,en)=>{const s=t(k);return s===k?(lang==='ru'?ru:en):s;};
-function saveFilters(){try{localStorage.setItem('flor.filters',JSON.stringify({onlyCompatible:state.filters.onlyCompatible}));}catch(e){}}
-function loadFilters(){try{const o=JSON.parse(localStorage.getItem('flor.filters')||'{}');return typeof o.onlyCompatible==='boolean'?o.onlyCompatible:true;}catch(e){return true;}}
-function resetFilters(){state.filters.group='all';state.filters.q='';state.filters.sort='name';state.filters.onlyCompatible=false;const s=$('#searchInput');if(s)s.value='';saveFilters();renderCatalog();}
-function applyVesselPreset(p){const d=p.dims_cm||{},v=state.vessel;v.preset=p.id;v.shape=p.shape;v.closure=p.closure_default||v.closure;v.neck=p.neck_diameter_cm||null;v.volumeLabel=p.volume_liters_label||null;if(d.diameter_cm!=null)v.diameter=d.diameter_cm;if(d.height_cm!=null)v.height=d.height_cm;if(d.width_cm!=null)v.width=d.width_cm;if(d.depth_cm!=null)v.depth=d.depth_cm;if(!p.systems.includes(state.system))state.system=p.systems[0];}
-state.filters.onlyCompatible=loadFilters();
+try{lang=localStorage.getItem('flor.lang')||'ru';const f=JSON.parse(localStorage.getItem('flor.filters')||'null');if(f){if(typeof f.plants==='boolean')state.filters.plants.only=f.plants;if(typeof f.fauna==='boolean')state.filters.fauna.only=f.fauna;}}catch(e){}
+const saveFilters=()=>{try{localStorage.setItem('flor.filters',JSON.stringify({plants:state.filters.plants.only,fauna:state.filters.fauna.only}));}catch(e){}};
 
-window.__ph=()=>'<div class="ph"><svg viewBox="0 0 24 24" class="ic"><path d="M12 21c5-3 8-7 8-12-5 0-9 3-12 8"/><path d="M12 21C7 18 4 14 4 9c5 0 9 3 12 8"/></svg></div>';
-window.__imgErr=function(img){const fb=img.getAttribute('data-fb');if(fb){img.setAttribute('data-fb','');img.src=fb;}else{img.outerHTML=window.__ph();}};
+window.__ph=()=>'<div class="ph">'+ICON.leaf+'</div>';
+window.__imgErr=function(img){const fb=img.getAttribute('data-fb');if(fb){img.setAttribute('data-fb','');img.src=fb;}else img.outerHTML=window.__ph();};
 
 async function j(u){const c=new AbortController(),to=setTimeout(()=>c.abort(),15000);try{const r=await fetch(u,{cache:'no-store',signal:c.signal});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}finally{clearTimeout(to);}}
 async function boot(){
@@ -23,40 +38,39 @@ async function boot(){
     for(const n of DATA){try{DB[n]=await j('data/'+n+'.json');}catch(e){throw new Error('data/'+n+'.json — '+e.message);}}
     for(const l of ['ru','en'])for(const n of NS){try{const c=await j('i18n/'+l+'/'+n+'.json');delete c.meta;if(n==='care'||n==='diag')I18N[l][n]=c;else Object.assign(I18N[l],c);}catch(e){throw new Error('i18n/'+l+'/'+n+'.json — '+e.message);}}
     DB.plants=DB.plants_fauna.plants||[];DB.fauna=DB.plants_fauna.fauna||DB.plants_fauna.invertebrates||[];
+    try{const p=await j('data/presets.json');PRESETS=p.presets||[];}catch(e){PRESETS=[];}
     restoreURL();if(!state.items.length)seed();
-    D=derive();
-    $('#boot').classList.add('hidden');$('#view-builder').classList.remove('hidden');
-    buildStatic();update();window.__florReady=true;
-  }catch(e){console.error(e);window.__florFail('Не удалось загрузить данные: '+e.message+'. Проверьте, что все файлы в /data и /i18n загружены, и обновите страницу (Ctrl+F5).');}
+    D=derive();booted=true;
+    $('#boot').classList.add('hidden');
+    applyTheme(localStorage.getItem('flor.theme')||'light');
+    buildStatic();render();window.__florReady=true;
+  }catch(e){console.error(e);window.__florFail('Не удалось загрузить данные: '+e.message+'. Проверьте файлы в /data и /i18n и обновите страницу (Ctrl+F5).');}
 }
 function t(path,vars){vars=vars||{};let s=path.split('.').reduce((o,k)=>o&&o[k],I18N[lang]);if(s==null)s=path.split('.').reduce((o,k)=>o&&o[k],I18N.en);if(s==null)s=path;return String(s).replace(/\{(\w+)\}/g,(_,k)=>vars[k]!=null?vars[k]:'{'+k+'}');}
 const nm=o=>!o?'':(lang==='ru'?o.name_ru:o.name_en)||o.name_latin||'';
 const fmt=n=>Number(n||0).toLocaleString(lang==='ru'?'ru-RU':'en-US',{maximumFractionDigits:1});
 const enumT=(e,v)=>t('enum.'+e+'.'+v);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function applyTheme(v){document.documentElement.setAttribute('data-theme',v);const b=$('#themeBtn');if(b){b.innerHTML=v==='dark'?ICON.sun:ICON.moon;b.title=v==='dark'?L('theme.light','Светлая тема','Light theme'):L('theme.dark','Тёмная тема','Dark theme');}}
 
 function seed(){state.items=[{kind:'plant',id:'plant_fittonia'},{kind:'plant',id:'plant_leucobryum_glaucum'},{kind:'plant',id:'plant_soleirolia_soleirolii'},{kind:'fauna',id:'fauna_collembola'}];state.stones=['ohko'];state.decor=['driftwood'];state.substrate='tropical';}
 function encodeState(){const v=state.vessel,p=new URLSearchParams();p.set('v',String(Math.round((D&&D.volume||0)*10)/10));p.set('sys',state.system);p.set('place',state.placement);p.set('water',state.water);p.set('exp',state.experience);if(state.style)p.set('style',state.style);p.set('shape',v.shape);p.set('h',v.height);p.set('d',v.diameter||'');p.set('w',v.width||'');p.set('dp',v.depth||'');p.set('items',state.items.map(i=>{const o=obj(i);return o?o.slug:'';}).filter(Boolean).join(','));p.set('stones',state.stones.join(','));p.set('decor',state.decor.join(','));if(state.substrate)p.set('sub',state.substrate);p.set('fl',[state.flags.grow,state.flags.winter,state.flags.water].map(b=>b?1:0).join(''));return p;}
 function restoreURL(){
   const p=new URLSearchParams(location.search);if(!p.has('sys'))return;
   state.system=p.get('sys');state.placement=p.get('place')||'east_west';state.water=p.get('water')||'soft';state.experience=p.get('exp')||'beginner';state.style=p.get('style')||'';
-  const v=state.vessel;
-  v.preset='custom';
-  v.shape=p.get('shape')||'jar';v.height=+p.get('h')||20;v.diameter=+p.get('d')||14;v.width=+p.get('w')||20;v.depth=+p.get('dp')||20;
-  const match=(DB.vessels.presets||[]).find(pr=>{
-    if(pr.shape!==v.shape)return false;const d=pr.dims_cm||{};
-    if(Math.abs((d.height_cm||0)-v.height)>0.5)return false;
-    if(['cube','tank','geo_house'].includes(v.shape))return Math.abs((d.width_cm||0)-v.width)<0.5&&Math.abs((d.depth_cm||0)-v.depth)<0.5;
-    return Math.abs((d.diameter_cm||0)-v.diameter)<0.5;
-  });
-  if(match){v.preset=match.id;v.closure=match.closure_default||v.closure;v.neck=match.neck_diameter_cm||null;v.volumeLabel=match.volume_liters_label||null;}
+  const v=state.vessel;v.preset='custom';v.shape=p.get('shape')||'jar';v.height=+p.get('h')||20;v.diameter=+p.get('d')||14;v.width=+p.get('w')||20;v.depth=+p.get('dp')||20;
+  const m=(DB.vessels.presets||[]).find(pr=>{if(pr.shape!==v.shape)return false;const d=pr.dims_cm||{};if(Math.abs((d.height_cm||0)-v.height)>.5)return false;if(['cube','tank','geo_house'].includes(v.shape))return Math.abs((d.width_cm||0)-v.width)<.5&&Math.abs((d.depth_cm||0)-v.depth)<.5;return Math.abs((d.diameter_cm||0)-v.diameter)<.5;});
+  if(m){v.preset=m.id;v.closure=m.closure_default||v.closure;v.neck=m.neck_diameter_cm||null;v.volumeLabel=m.volume_liters_label||null;}
   else if(v.shape==='bottle'&&p.get('v'))v.volumeLabel=+p.get('v')||null;
   const all=DB.plants.concat(DB.fauna);
   state.items=(p.get('items')||'').split(',').filter(Boolean).map(s=>{const o=all.find(x=>x.slug===s);return o?{kind:o.id.indexOf('plant_')===0?'plant':'fauna',id:o.id}:null;}).filter(Boolean);
   state.stones=(p.get('stones')||'').split(',').filter(Boolean);state.decor=(p.get('decor')||'').split(',').filter(Boolean);state.substrate=p.get('sub')||null;
   const f=p.get('fl')||'000';state.flags={grow:f[0]==='1',winter:f[1]==='1',water:f[2]==='1'};
 }
-const store={all:()=>{try{return JSON.parse(localStorage.getItem('florarium.builds.v1')||'[]');}catch(e){return[];}},save(name){const a=store.all();a.unshift({id:Date.now(),name:name,created:new Date().toISOString(),state:JSON.parse(JSON.stringify(state))});localStorage.setItem('florarium.builds.v1',JSON.stringify(a));},del(id){localStorage.setItem('florarium.builds.v1',JSON.stringify(store.all().filter(x=>x.id!==id)));},load(id){const b=store.all().find(x=>x.id===id);if(b){Object.assign(state,JSON.parse(JSON.stringify(b.state)));if(state.filters.onlyCompatible==null)state.filters.onlyCompatible=true;D=derive();buildStatic();update();toast(t('toast.saved'));}}};
+const store={all:()=>{try{return JSON.parse(localStorage.getItem('florarium.builds.v1')||'[]');}catch(e){return[];}},
+  save(n){const a=store.all();a.unshift({id:Date.now(),name:n,created:new Date().toISOString(),state:JSON.parse(JSON.stringify(state))});localStorage.setItem('florarium.builds.v1',JSON.stringify(a));},
+  del(id){localStorage.setItem('florarium.builds.v1',JSON.stringify(store.all().filter(x=>x.id!==id)));},
+  load(id){const b=store.all().find(x=>x.id===id);if(!b)return;const s=JSON.parse(JSON.stringify(b.state));delete s.tab;delete s.buildTab;delete s.careTab;Object.assign(state,s);if(!state.filters.plants)state.filters={plants:{group:'all',q:'',sort:'name',only:true},fauna:{group:'all',q:'',sort:'name',only:true}};state.tab='build';state.buildTab='composition';render();toast(t('toast.saved'));}};
 
 function obj(i){return (i.kind==='plant'?DB.plants:DB.fauna).find(x=>x.id===i.id);}
 const selP=()=>state.items.filter(i=>i.kind==='plant').map(obj).filter(Boolean);
@@ -68,6 +82,7 @@ function habit(p){const l=p.layer_form||[];if(l.length===1&&l[0]==='mount')retur
 function currentSub(){if(state.substrate)return state.substrate;const c=inter(selP().concat(selF()).map(x=>x.substrate));return c[0]||'tropical';}
 const subObj=()=>DB.materials.substrates.find(s=>s.id===currentSub());
 const compName=id=>{const c=DB.materials.components.find(x=>x.id===id);return c?nm(c):id;};
+function applyVesselPreset(p){const d=p.dims_cm||{},v=state.vessel;v.preset=p.id;v.shape=p.shape;v.closure=p.closure_default||v.closure;v.neck=p.neck_diameter_cm||null;v.volumeLabel=p.volume_liters_label||null;if(d.diameter_cm!=null)v.diameter=d.diameter_cm;if(d.height_cm!=null)v.height=d.height_cm;if(d.width_cm!=null)v.width=d.width_cm;if(d.depth_cm!=null)v.depth=d.depth_cm;if(!p.systems.includes(state.system))state.system=p.systems[0];}
 
 function derive(){
   const v=state.vessel,N=DB.norms,pi=Math.PI,d=v.diameter||14,h=v.height||20,w=v.width||20,dp=v.depth||20;let vol,foot;
@@ -91,7 +106,7 @@ function derive(){
 }
 function findPair(f){const all=selP().concat(selF());for(let i=0;i<all.length;i++)for(let k=i+1;k<all.length;k++)if(!all[i][f].some(x=>all[k][f].indexOf(x)>=0))return[nm(all[i]),nm(all[k])];return['—','—'];}
 function evaluate(){
-  const P=selP(),F=selF(),S=stones(),DC=decor(),hits=[],add=(id,sev,vars)=>hits.push({id:id,sev:sev,vars:vars||{}}),sys=state.system,vol=D.volume;
+  const P=selP(),F=selF(),S=stones(),DC=decor(),hits=[],add=(id,sev,vars)=>hits.push({id,sev,vars:vars||{}}),sys=state.system,vol=D.volume;
   const preset=DB.vessels.presets.find(x=>x.id===state.vessel.preset);
   const allowed=preset?preset.systems:(state.vessel.closure==='sealable'?['closed','semi','open']:state.vessel.closure==='vented'?['semi','open']:['open']);
   if(allowed.indexOf(sys)<0)add('r_vessel_closure','block',{shape:enumT('vessel_shape',state.vessel.shape)});
@@ -158,82 +173,201 @@ function itemStatus(o){
 }
 function imgHTML(o,cls){const im=o.image||{},local=im.file||'',remote=im.source_url||'',src=local||remote;if(!src)return window.__ph();const fb=local&&remote?remote:'';return '<img class="'+(cls||'')+'" src="'+esc(src)+'" alt="'+esc(nm(o))+'" loading="lazy" referrerpolicy="no-referrer" data-fb="'+esc(fb)+'" onerror="__imgErr(this)">';}
 
-function buildStatic(){document.documentElement.lang=lang;$('#langBtn').textContent=lang.toUpperCase();$$('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));$('#navLinks').innerHTML=['builder','care','diag','saved'].map(v=>'<button class="nav-link'+(state.view===v?' active':'')+'" data-view="'+v+'">'+t('nav.'+v)+'</button>').join('');$('#searchInput').placeholder=lang==='ru'?'Поиск растения или живности…':'Search plant or fauna…';renderConfig();renderMobile();}
-function renderConfig(){
-  const v=state.vessel,ps=DB.vessels.presets;
-  $('#configPanel').innerHTML=
-  '<div class="cfg-title">'+t('step.vessel')+' · '+t('step.system')+'</div>'+
-  '<div class="cfg-block"><div class="cfg-label">'+t('step.vessel')+'</div><select class="select" id="vesselSelect">'+ps.map(p=>'<option value="'+p.id+'"'+(p.id===v.preset?' selected':'')+'>'+nm(p)+' · '+fmt(p.volume_liters_approx)+' '+t('units.l')+'</option>').join('')+(v.preset==='custom'?'<option value="custom" selected>'+L('vessel.custom','Своя ёмкость','Custom vessel')+'</option>':'')+'</select></div>'+
-  '<div class="cfg-block"><div class="cfg-label">'+t('input.system')+'</div><div class="seg" id="sysSeg">'+['closed','semi','open'].map(s=>'<button data-sys="'+s+'" class="'+(state.system===s?'on':'')+'">'+enumT('system_type',s)+'</button>').join('')+'</div></div>'+
-  '<div class="cfg-block"><div class="cfg-label"><span>'+t('derived.volume')+'</span><span class="cfg-val" id="volVal"></span></div><input class="range" id="volRange" type="range" min="1" max="15" step="0.5"></div>'+
-  '<div class="cfg-block"><div class="cfg-label"><span>'+t('input.height')+'</span><span class="cfg-val" id="hVal"></span></div><input class="range" id="hRange" type="range" min="8" max="45" step="1"></div>'+
-  '<div class="cfg-block"><div class="cfg-label">'+t('input.placement')+'</div><select class="select" id="placeSelect">'+DB.criteria.enums.placement.values.map(p=>'<option value="'+p+'"'+(p===state.placement?' selected':'')+'>'+enumT('placement',p)+'</option>').join('')+'</select><p class="sub" style="margin-top:6px">'+t('input.hint_placement')+'</p></div>'+
-  '<div class="cfg-block"><div class="cfg-label">'+t('input.water')+'</div><select class="select" id="waterSelect">'+DB.criteria.enums.water_type.values.map(w=>'<option value="'+w+'"'+(w===state.water?' selected':'')+'>'+enumT('water_type',w)+'</option>').join('')+'</select></div>'+
-  '<div class="cfg-block"><div class="cfg-label">'+t('input.style')+'</div><select class="select" id="styleSelect"><option value="">—</option>'+DB.styles.styles.map(s=>'<option value="'+s.id+'"'+(s.id===state.style?' selected':'')+'>'+t('styles.'+s.id+'.name')+'</option>').join('')+'</select></div>'+
-  '<div class="cfg-block"><div class="cfg-label">'+t('input.experience')+'</div><div class="seg" id="expSeg">'+['beginner','experienced'].map(e=>'<button data-exp="'+e+'" class="'+(state.experience===e?'on':'')+'">'+enumT('experience',e)+'</button>').join('')+'</div></div>'+
-  '<div class="cfg-block">'+[['grow','input.grow_light'],['winter','input.wintering'],['water','input.open_water']].map(x=>'<label class="toggle-row"><span>'+t(x[1])+'</span><span class="sw"><input type="checkbox" data-flag="'+x[0]+'"'+(state.flags[x[0]]?' checked':'')+'><i></i></span></label>').join('')+'</div>'+
-  '<div class="cfg-block"><div class="cfg-label">'+t('step.hardscape')+'</div><select class="select" id="stoneSelect"><option value="">'+(lang==='ru'?'Добавить камень…':'Add stone…')+'</option>'+DB.materials.stones.map(s=>'<option value="'+s.id+'">'+nm(s)+'</option>').join('')+'</select><select class="select" id="decorSelect" style="margin-top:8px"><option value="">'+(lang==='ru'?'Добавить декор…':'Add decor…')+'</option>'+DB.materials.decor.map(s=>'<option value="'+s.id+'">'+nm(s)+'</option>').join('')+'</select><div class="ph-chips" style="margin-top:10px">'+state.stones.map(id=>{const s=DB.materials.stones.find(x=>x.id===id);return s?'<button class="ph-chip" data-rm-stone="'+id+'">'+nm(s)+' ×</button>':'';}).join('')+state.decor.map(id=>{const s=DB.materials.decor.find(x=>x.id===id);return s?'<button class="ph-chip" data-rm-decor="'+id+'">'+nm(s)+' ×</button>':'';}).join('')+'</div></div>';
-  syncRanges();
+/* ── shell ── */
+const tabLabel=k=>({build:L('tab.build','Сборка','Build'),plants:t('step.plants'),fauna:t('step.fauna'),setup:L('tab.setup','Условия','Setup'),care:t('nav.care')})[k];
+function buildStatic(){
+  document.documentElement.lang=lang;$('#langBtn').textContent=lang.toUpperCase();
+  $$('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
+  $('#tabnav').innerHTML=TABS.map(k=>'<button data-go="'+k+'" class="'+(state.tab===k?'on':'')+'">'+ICON[k]+'<span>'+tabLabel(k)+'</span></button>').join('');
+  $('#tabbar').innerHTML=TABS.map(k=>'<button data-go="'+k+'" class="'+(state.tab===k?'on':'')+'" data-tabbtn="'+k+'">'+ICON[k]+'<span>'+tabLabel(k)+'</span></button>').join('');
+  ['plants','fauna'].forEach(kind=>{
+    $('#'+kind+'Toolbar').innerHTML='<div class="search">'+ICON.search+'<input type="search" id="q-'+kind+'" autocomplete="off" placeholder="'+(lang==='ru'?'Поиск…':'Search…')+'" value="'+esc(state.filters[kind].q)+'"></div>'+
+      '<select class="select" id="sort-'+kind+'">'+[['name',lang==='ru'?'По имени':'Name'],['care',lang==='ru'?'По сложности':'Care'],['size',lang==='ru'?'По размеру':'Size']].map(x=>'<option value="'+x[0]+'"'+(state.filters[kind].sort===x[0]?' selected':'')+'>'+x[1]+'</option>').join('')+'</select>';
+  });
+  applyTheme(document.documentElement.getAttribute('data-theme')||'light');
 }
-function syncRanges(){const vr=$('#volRange'),hr=$('#hRange');if(!vr||!D)return;vr.value=Math.min(15,Math.max(1,D.volume));vr.style.setProperty('--p',((vr.value-1)/14*100)+'%');hr.value=state.vessel.height;hr.style.setProperty('--p',((hr.value-8)/37*100)+'%');$('#volVal').textContent=fmt(D.volume)+' '+t('units.l');$('#hVal').textContent=state.vessel.height+' '+t('units.cm');}
-function renderCatalog(){
-  const f=state.filters;
-  $('#catalogTabs').innerHTML='<button data-tab="plants" class="'+(f.tab==='plants'?'on':'')+'">'+t('step.plants')+'</button><button data-tab="fauna" class="'+(f.tab==='fauna'?'on':'')+'">'+t('step.fauna')+'</button>';
-  const list=f.tab==='plants'?DB.plants:DB.fauna,groups=[...new Set(list.map(x=>x.group))];
-  $('#groupChips').innerHTML='<button class="chip'+(f.group==='all'?' on':'')+'" data-group="all">'+t('btn.show_all')+'</button>'+groups.map(g=>'<button class="chip'+(f.group===g?' on':'')+'" data-group="'+g+'">'+t('group.'+g)+'</button>').join('')+'<label class="pill-toggle'+(f.onlyCompatible?' on':'')+'"><input type="checkbox" id="onlyCompat"'+(f.onlyCompatible?' checked':'')+'><span>'+L('filter.only_compatible','Только совместимые','Compatible only')+'</span></label>';
-  $('#sortSelect').innerHTML=[['name',lang==='ru'?'По имени':'Name'],['care',lang==='ru'?'По сложности':'Care'],['size',lang==='ru'?'По размеру':'Size']].map(x=>'<option value="'+x[0]+'"'+(f.sort===x[0]?' selected':'')+'>'+x[1]+'</option>').join('');
+function render(opts){
+  opts=opts||{};if(!booted)return;
+  D=derive();const hits=evaluate();
+  document.body.dataset.tab=state.tab;
+  document.body.dataset.rail=['plants','fauna','setup'].includes(state.tab)?'1':'0';
+  TABS.forEach(k=>{const p=$('#pane-'+k);if(p)p.classList.toggle('hidden',k!==state.tab);});
+  $$('#tabnav button,#tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.go===state.tab));
+  const bl=hits.filter(h=>h.sev==='block').length;
+  const bb=$('#tabbar [data-tabbtn="build"]');if(bb){const old=bb.querySelector('.badge');if(old)old.remove();if(bl)bb.insertAdjacentHTML('beforeend','<span class="badge">'+bl+'</span>');}
+  renderStatus(hits);
+  if(state.tab==='build')renderBuild(hits);
+  if(state.tab==='plants')renderCatalog('plants');
+  if(state.tab==='fauna')renderCatalog('fauna');
+  if(state.tab==='setup'&&!opts.skipSetup)renderSetup();
+  if(state.tab==='setup'&&opts.skipSetup)syncSetupValues();
+  if(state.tab==='care')renderCare();
+  renderRail(hits);
+}
+function renderStatus(hits){
+  const el=$('#statusStrip'),bl=hits.filter(h=>h.sev==='block').length,wa=hits.filter(h=>h.sev==='warning').length;
+  const lvl=bl?'block':wa?'warn':'ok';
+  el.innerHTML='<span class="s-orb '+lvl+'"></span><span class="s-text">'+selP().length+' '+t('step.plants').toLowerCase()+' · '+selF().length+' '+t('step.fauna').toLowerCase()+' <i>· '+fmt(D.volume)+' '+t('units.l')+'</i></span>'+(bl?'<span class="badge">'+bl+'</span>':'')+ICON.chev;
+}
+function go(tab){if(!TABS.includes(tab))return;state.tab=tab;render();window.scrollTo({top:0,behavior:'smooth'});}
+
+/* ── build pane ── */
+function renderBuild(hits){
+  const bl=hits.filter(h=>h.sev==='block'),wa=hits.filter(h=>h.sev==='warning'),inf=hits.filter(h=>h.sev==='info');
+  const lvl=bl.length?'block':wa.length?'warn':'ok';
+  const title=bl.length?t('compat.blocks_title'):wa.length?t('compat.warnings_title'):t('compat.all_good');
+  const note=bl.length?L('build.fix_first','Сначала уберите запреты — их нельзя обойти','Clear the blockers first — they cannot be bypassed'):wa.length?L('build.workable','Сборка жизнеспособна, но требует внимания','Viable, but needs attention'):L('build.ready','Условия согласованы — можно сажать','Conditions align — ready to plant');
+  $('#pvMeta').innerHTML='<span class="tag size">'+fmt(D.volume)+' '+t('units.l')+'</span><span class="tag light">'+enumT('system_type',state.system)+'</span><span class="tag care">'+enumT('vessel_shape',state.vessel.shape)+'</span>';
+  $('#verdictCard').innerHTML='<div class="verdict-head"><span class="verdict-orb '+lvl+'"></span><span><span class="verdict-title">'+title+'</span><span class="verdict-note">'+note+'</span></span></div>'+
+    '<div class="stat-row"><div class="stat"><b>'+selP().length+'</b><span>'+t('step.plants')+'</span></div><div class="stat"><b>'+selF().length+'</b><span>'+t('step.fauna')+'</span></div><div class="stat"><b>'+fmt(D.freeHeight)+'</b><span>'+t('units.cm')+' '+L('build.free','свободно','free')+'</span></div><div class="stat"><b>'+fmt(D.footprint)+'</b><span>'+t('units.cm2')+'</span></div></div>'+
+    '<div class="quick-actions"><button class="btn primary" id="careBtn"'+(bl.length?' disabled':'')+'>'+t('btn.finalize')+'</button><button class="btn ghost" data-go="plants">'+t('btn.add')+' '+t('step.plants').toLowerCase()+'</button><button class="btn ghost" data-go="setup">'+tabLabel('setup')+'</button></div>';
+  const bt=[['composition',L('build.composition','Состав','Composition'),state.items.length],['issues',L('build.issues','Проверка','Check'),bl.length+wa.length+inf.length],['details',L('build.details','Детали','Details'),0],['recipes',L('build.recipes','Рецепты','Recipes'),PRESETS.length],['saved',L('build.saved','Мои банки','My jars'),store.all().length]];
+  $('#buildSubtabs').innerHTML=bt.map(x=>'<button data-btab="'+x[0]+'" class="'+(state.buildTab===x[0]?'on':'')+'" role="tab" aria-selected="'+(state.buildTab===x[0])+'">'+x[1]+(x[2]?'<span class="badge'+(x[0]==='issues'&&bl.length?'':' soft')+'">'+x[2]+'</span>':'')+'</button>').join('');
+  const body=$('#buildBody');
+  if(state.buildTab==='composition')body.innerHTML=compositionHTML()+metersHTML()+actionsHTML(bl.length);
+  else if(state.buildTab==='issues')body.innerHTML=issuesHTML(hits);
+  else if(state.buildTab==='details')body.innerHTML=detailsHTML();
+  else if(state.buildTab==='recipes')body.innerHTML=recipesHTML();
+  else body.innerHTML=savedHTML();
+}
+function compositionHTML(){
+  return '<div class="section"><h3>'+t('step.plants')+' · '+t('step.fauna')+'</h3><div class="sel-list">'+(state.items.map((it,i)=>{const o=obj(it);return o?'<div class="sel-row" draggable="true" data-idx="'+i+'">'+imgHTML(o,'sel-thumb')+'<span class="sel-info"><span class="sel-name">'+nm(o)+'</span><span class="sel-meta">'+t('group.'+o.group)+'</span></span><button class="sel-x" data-rm="'+i+'" aria-label="'+t('btn.remove')+'">'+ICON.x+'</button></div>':'';}).join('')||'<div class="empty small"><div class="empty-orb"></div><p>'+t('state.empty_body')+'</p><button class="btn ghost" data-go="plants">'+t('state.empty_action')+'</button></div>')+'</div></div>';
+}
+function metersHTML(){return '<div class="section"><h3>'+t('derived.capacity')+'</h3>'+meter(t('enum.layer_form.bush'),D.buckets.upright_trailing)+meter(t('enum.layer_form.carpet'),D.buckets.groundcover)+'</div>';}
+function meter(label,b){const r=b.limit&&isFinite(b.limit)?b.used/b.limit:0,cls=r>1.25?'block':r>1?'warn':'';return '<div class="meter"><div class="meter-top"><span>'+label+'</span><span>'+fmt(b.used)+' / '+fmt(b.limit)+' '+t('units.cm2')+'</span></div><div class="meter-bar"><div class="meter-fill '+cls+'" style="width:'+Math.min(100,r*100)+'%"></div></div></div>';}
+function actionsHTML(dis){return '<div class="section"><h3>'+L('build.actions','Действия','Actions')+'</h3><div class="actions"><button class="btn primary" id="dlCareBtn"'+(dis?' disabled':'')+'>'+L('btn.download_care','Скачать памятку','Download care guide')+'</button><button class="btn ghost" id="saveBtn">'+t('btn.save')+'</button><button class="btn ghost" id="shareBtn">'+t('btn.copy_link')+'</button><button class="btn ghost" id="aiBtn">'+t('btn.check_ai')+'</button></div></div>';}
+function issuesHTML(hits){
+  if(!hits.length)return '<div class="empty"><div class="empty-orb"></div><h3>'+t('compat.all_good')+'</h3><p class="sub">'+L('build.no_issues','Ни одного замечания — редкий случай','No notes at all — a rare case')+'</p></div>';
+  const sev=s=>t('severity.'+(s==='block'?'block':s==='warning'?'warning':'info'));
+  return ['block','warning','info'].map(s=>{const g=hits.filter(h=>h.sev===s);return g.length?'<div class="section"><h3>'+sev(s)+' · '+g.length+'</h3>'+g.map(h=>'<div class="issue '+h.sev+'"><div class="issue-head">'+sev(h.sev)+'</div><div>'+t('rules.'+h.id+'.msg',h.vars)+'</div><div class="issue-remedy">'+t('rules.'+h.id+'.remedy',h.vars)+'</div></div>').join('')+'</div>':'';}).join('');
+}
+function detailsHTML(){
+  const sub=subObj(),N=DB.norms,ch=(N.layers.charcoal&&N.layers.charcoal.thickness_cm)?N.layers.charcoal.thickness_cm[0]:.5;
+  return '<div class="section"><h3>'+t('derived.ph_corridor')+'</h3><div class="tags">'+(D.ph.map(z=>'<span class="tag size">'+enumT('ph_zone',z)+'</span>').join('')||'<span class="sub">—</span>')+'</div></div>'+
+    '<div class="section"><h3>'+L('build.layers','Слои','Layers')+'</h3><dl class="kv"><dt>'+t('bom.drainage')+'</dt><dd>'+fmt(D.drainage)+' '+t('units.cm')+'</dd><dt>'+t('bom.separator')+'</dt><dd>0.3 '+t('units.cm')+'</dd><dt>'+t('bom.charcoal')+'</dt><dd>'+fmt(ch)+' '+t('units.cm')+'</dd><dt>'+t('bom.substrate')+'</dt><dd>'+fmt(D.depth)+' '+t('units.cm')+'</dd></dl></div>'+
+    (sub?'<div class="section"><h3>'+nm(sub)+'</h3><p class="sub">'+sub.recipe.map(r=>Math.round(r.pct)+'% '+compName(r.component)).join(' · ')+'</p></div>':'')+
+    '<div class="section"><h3>'+t('bom.title')+'</h3><dl class="kv"><dt>'+t('bom.drainage')+'</dt><dd>'+fmt(D.footprint*D.drainage/1000)+' '+t('units.l')+'</dd><dt>'+t('bom.substrate')+'</dt><dd>'+fmt(D.footprint*D.depth/1000)+' '+t('units.l')+'</dd><dt>'+t('bom.charcoal')+'</dt><dd>'+Math.round(D.volume*15)+' '+t('units.ml')+'</dd></dl><p class="sub" style="margin-top:9px">'+t('bom.total_note')+'</p></div>';
+}
+function jarIcon(shape){const p={bowl:'M4 14 L4 30 Q4 44 21 44 Q38 44 38 30 L38 14',sphere:'M21 6 A15 15 0 1 1 20.9 6 Z',cube:'M5 10 H37 V44 H5 Z',bottle:'M15 4 L15 14 L6 22 L6 44 L36 44 L36 22 L27 14 L27 4',geo_house:'M21 4 L38 18 L38 44 L4 44 L4 18 Z',tank:'M3 12 H39 V44 H3 Z'}[shape]||'M8 8 Q8 4 12 4 H30 Q34 4 34 8 L34 40 Q34 44 30 44 H12 Q8 44 8 40 Z';return '<svg viewBox="0 0 42 48" aria-hidden="true"><path d="'+p+'"/><path d="M6 38 H36" opacity=".45"/><path d="M6 33 H36" opacity=".25"/></svg>';}
+function recipesHTML(){
+  if(!PRESETS.length)return '<div class="empty"><div class="empty-orb"></div><h3>'+L('build.no_recipes','Рецепты не загружены','No recipes loaded')+'</h3><p class="sub">'+L('build.no_recipes_sub','Добавьте data/presets.json — появятся готовые сборки','Add data/presets.json to get ready-made builds')+'</p></div>';
+  const all=DB.plants.concat(DB.fauna);
+  return '<div class="section"><h3>'+L('build.recipes','Готовые рецепты','Ready-made recipes')+'</h3><p class="sub" style="margin-bottom:12px">'+L('build.recipes_sub','Проверенные сборки в один клик — потом меняйте под себя','Vetted builds in one click — tweak them afterwards')+'</p><div class="recipes">'+PRESETS.map(p=>{
+    const v=(DB.vessels.presets||[]).find(x=>x.id===p.vessel)||{};
+    const objs=(p.items||[]).map(s=>all.find(x=>x.slug===s)).filter(Boolean);
+    const av=objs.slice(0,4).map(o=>{const im=o.image||{},src=im.file||im.source_url||'';return src?'<img src="'+esc(src)+'" alt="'+esc(nm(o))+'" title="'+esc(nm(o))+'" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML=window.__ph()">':'<span class="av" title="'+esc(nm(o))+'">'+ICON.leaf+'</span>';}).join('')+(objs.length>4?'<span class="more">+'+(objs.length-4)+'</span>':'');
+    return '<article class="recipe"><div class="recipe-top"><span class="recipe-jar">'+jarIcon(v.shape)+'</span><span><span class="recipe-name">'+esc(nm(p)||p.name_ru)+'</span><span class="recipe-vol">'+(v.volume_liters_approx||'?')+' '+t('units.l')+' · '+enumT('system_type',p.system)+'</span></span></div><p class="recipe-desc">'+esc(lang==='ru'?p.desc_ru:(p.desc_en||p.desc_ru))+'</p><div class="recipe-foot"><span class="avatars">'+av+'</span><button class="recipe-go" data-recipe="'+esc(p.id)+'">'+L('build.apply','Собрать','Build')+'</button></div></article>';
+  }).join('')+'</div><div style="margin-top:12px"><button class="btn ghost" id="randRecipe">'+ICON.dice+L('build.random','Случайный рецепт','Surprise me')+'</button></div></div>';
+}
+function savedHTML(){
+  const a=store.all();
+  if(!a.length)return '<div class="empty"><div class="empty-orb"></div><h3>'+L('state.empty_saved_title','Пока нет сохранённых банок','No saved jars yet')+'</h3><p class="sub">'+L('state.empty_saved_text','Соберите композицию и нажмите «Сохранить сборку».','Build a composition and press “Save build”.')+'</p><button class="btn ghost" id="saveBtn">'+t('btn.save')+'</button></div>';
+  return '<div class="section"><h3>'+t('saved.title')+' · '+a.length+'</h3><div class="saved-grid">'+a.map(b=>'<div class="saved-card"><h3>'+esc(b.name)+'</h3><div class="saved-meta">'+new Date(b.created).toLocaleDateString(lang==='ru'?'ru-RU':'en-US')+' · '+b.state.items.length+' '+t('units.pcs')+'</div><div class="saved-actions"><button class="btn primary" data-load="'+b.id+'">'+t('btn.load')+'</button><button class="btn ghost" data-del="'+b.id+'">'+t('btn.delete')+'</button></div></div>').join('')+'</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" id="exportBtn">'+t('btn.export')+'</button><label class="btn ghost"><span>'+t('btn.import')+'</span><input type="file" id="importFile" accept="application/json" hidden></label></div></div>';
+}
+
+/* ── catalog ── */
+function renderCatalog(kind){
+  const f=state.filters[kind],list=kind==='plants'?DB.plants:DB.fauna;
+  const groups=[...new Set(list.map(x=>x.group))];
+  $('#'+kind+'Chips').innerHTML='<button class="chip'+(f.group==='all'?' on':'')+'" data-group="'+kind+':all">'+t('btn.show_all')+'</button>'+groups.map(g=>'<button class="chip'+(f.group===g?' on':'')+'" data-group="'+kind+':'+g+'">'+t('group.'+g)+'</button>').join('')+
+    '<label class="pill-toggle'+(f.only?' on':'')+'"><input type="checkbox" id="only-'+kind+'"'+(f.only?' checked':'')+'><span>'+L('filter.only_compatible','Только совместимые','Compatible only')+'</span></label>';
+  renderGrid(kind);
+}
+function renderGrid(kind){
+  const f=state.filters[kind],list=kind==='plants'?DB.plants:DB.fauna;
   let items=list.filter(o=>{if(f.group!=='all'&&o.group!==f.group)return false;if(f.q&&(`${o.name_ru} ${o.name_en||''} ${o.name_latin}`.toLowerCase().indexOf(f.q.toLowerCase())<0))return false;if(state.style&&o.styles&&!o.styles.includes(state.style))return false;return true;});
   const st=new Map();items.forEach(o=>st.set(o.id,itemStatus(o)));
-  const total=items.length;
-  if(f.onlyCompatible)items=items.filter(o=>st.get(o.id).level!=='block');
+  const total=items.length;if(f.only)items=items.filter(o=>st.get(o.id).level!=='block');
   const hidden=total-items.length;
   const co={easy:0,medium:1,expert:2},so={micro:0,mini:1,large:2};
   items.sort((a,b)=>f.sort==='care'?(co[a.care_level]||0)-(co[b.care_level]||0):f.sort==='size'?(so[a.size]||0)-(so[b.size]||0):nm(a).localeCompare(nm(b)));
-  const cards=items.map((o,i)=>{const s=st.get(o.id),added=s.level==='added',isP=o.id.indexOf('plant_')===0;const tags=isP?'<span class="tag light">'+enumT('light',o.light_optimum)+'</span><span class="tag care">'+enumT('care_level',o.care_level)+'</span><span class="tag size">'+enumT('size',o.size)+'</span>':'<span class="tag care">'+o.role.map(r=>enumT('fauna_role',r)).join(' · ')+'</span>';return '<article class="card'+(s.level==='block'?' blocked':'')+'" data-open="'+o.id+'" tabindex="0" style="animation-delay:'+Math.min(i,8)*30+'ms"><div class="card-photo">'+imgHTML(o)+'<span class="status-dot '+(added?'added':s.level)+'" title="'+esc(s.reason||'')+'"></span></div><div class="card-body"><div class="card-name">'+nm(o)+'</div><div class="card-latin">'+o.name_latin+'</div><div class="card-tags">'+tags+'</div><button class="card-add'+(added?' added':'')+'" data-add="'+o.id+'"'+(s.level==='block'?' disabled':'')+'>'+(added?t('btn.remove'):s.level==='block'?t('severity.block'):t('btn.add'))+'</button></div></article>';}).join('');
-  const footer=hidden?'<div class="hidden-note"><span>'+L('filter.hidden','Скрыто несовместимых: {n}','Hidden incompatible: {n}').replace('{n}',hidden)+'</span><button class="link-btn" id="showHiddenBtn">'+t('btn.show_all')+'</button></div>':'';
-  const empty=items.length?'':'<div class="empty"><div class="empty-orb"></div><h3>'+L('state.empty_catalog_title','Здесь пусто','Nothing here')+'</h3><p class="sub">'+L('state.empty_catalog_text','Сбросьте фильтры или выберите другую группу.','Reset the filters or pick another group.')+'</p><button class="btn ghost" id="resetFiltersBtn">'+L('btn.reset_filters','Сбросить фильтры','Reset filters')+'</button></div>';
-  $('#catalogCards').innerHTML=cards+footer+empty;
+  $('#'+kind+'Count').textContent=items.length+' '+(lang==='ru'?'из':'of')+' '+list.length+(state.style?' · '+t('styles.'+state.style+'.name'):'');
+  const cards=items.map((o,i)=>{const s=st.get(o.id),added=s.level==='added',isP=o.id.indexOf('plant_')===0;
+    const tags=isP?'<span class="tag light">'+enumT('light',o.light_optimum)+'</span><span class="tag care">'+enumT('care_level',o.care_level)+'</span><span class="tag size">'+enumT('size',o.size)+'</span>':'<span class="tag care">'+o.role.map(r=>enumT('fauna_role',r)).join(' · ')+'</span>';
+    return '<article class="tile'+(s.level==='block'?' blocked':'')+'" data-open="'+o.id+'" tabindex="0" style="animation-delay:'+Math.min(i,10)*26+'ms"><div class="tile-photo">'+imgHTML(o)+'<span class="dot '+(added?'added':s.level)+'" title="'+esc(s.reason||'')+'"></span></div><div class="tile-body"><div class="tile-name">'+nm(o)+'</div><div class="tile-latin">'+o.name_latin+'</div><div class="tags">'+tags+'</div><button class="tile-add'+(added?' added':'')+'" data-add="'+o.id+'"'+(s.level==='block'?' disabled':'')+'>'+(added?t('btn.remove'):s.level==='block'?t('severity.block'):t('btn.add'))+'</button></div></article>';}).join('');
+  const note=hidden?'<div class="grid-note"><span>'+L('filter.hidden','Скрыто несовместимых: {n}','Hidden incompatible: {n}').replace('{n}',hidden)+'</span><button class="link-btn" data-showhidden="'+kind+'">'+t('btn.show_all')+'</button></div>':'';
+  const empty=items.length?'':'<div class="empty"><div class="empty-orb"></div><h3>'+L('state.empty_catalog_title','Здесь пусто','Nothing here')+'</h3><p class="sub">'+L('state.empty_catalog_text','Сбросьте фильтры или выберите другую группу.','Reset the filters or pick another group.')+'</p><button class="btn ghost" data-reset="'+kind+'">'+L('btn.reset_filters','Сбросить фильтры','Reset filters')+'</button></div>';
+  $('#'+kind+'Grid').innerHTML=cards+note+empty;
 }
-function meter(label,b){const r=b.limit&&isFinite(b.limit)?b.used/b.limit:0,cls=r>1.25?'block':r>1?'warn':'';return '<div class="meter"><div class="meter-top"><span>'+label+'</span><span>'+fmt(b.used)+' / '+fmt(b.limit)+' '+t('units.cm2')+'</span></div><div class="meter-bar"><div class="meter-fill '+cls+'" style="width:'+Math.min(100,r*100)+'%"></div></div></div>';}
-function renderJar(hits){
-  const panel=$('#jarPanel');if(!panel)return;
-  const pv=panel.querySelector(':scope > .pv-host');if(pv)pv.remove();
-  const bl=hits.filter(h=>h.sev==='block'),wa=hits.filter(h=>h.sev==='warning'),inf=hits.filter(h=>h.sev==='info');
-  if(bl.length&&!prevBlockCount)state.jarTab='issues';
-  else if(!bl.length&&prevBlockCount&&state.jarTab==='issues')state.jarTab='build';
-  prevBlockCount=bl.length;
-  const tab=state.jarTab||'build',badge=bl.length+wa.length,sub=subObj();
-  const lvl=bl.length?'block':wa.length?'warn':'ok';
-  const title=bl.length?t('compat.blocks_title'):wa.length?t('compat.warnings_title'):t('compat.all_good');
-  const sev=s=>t('severity.'+(s==='block'?'block':s==='warning'?'warning':'info'));
-  const tabsHtml='<div class="tabs jar-tabs" role="tablist">'+[['build',L('jar.tab_build','Сборка','Build')],['issues',L('jar.tab_issues','Конфликты','Issues')],['details',L('jar.tab_details','Детали','Details')]].map(x=>'<button role="tab" aria-selected="'+(tab===x[0])+'" class="'+(tab===x[0]?'on':'')+'" data-jartab="'+x[0]+'">'+x[1]+(x[0]==='issues'&&badge?'<span class="tab-badge" aria-live="polite">'+badge+'</span>':'')+'</button>').join('')+'</div>';
-  const verdict='<div class="jar-head"><div class="verdict-orb '+lvl+'"></div><div><div class="verdict-title">'+title+'</div><div class="verdict-counts">'+bl.length+' '+sev('block').toLowerCase()+' · '+wa.length+' '+sev('warning').toLowerCase()+' · '+inf.length+' '+sev('info').toLowerCase()+'</div></div></div>';
-  const list='<div class="jar-section"><h3>'+t('step.plants')+' · '+t('step.fauna')+'</h3><div class="sel-list" id="selList">'+(state.items.map((it,idx)=>{const o=obj(it);return o?'<div class="sel-row" draggable="true" data-idx="'+idx+'">'+imgHTML(o,'sel-thumb')+'<div class="sel-info"><div class="sel-name">'+nm(o)+'</div><div class="sel-meta">'+t('group.'+o.group)+'</div></div><button class="sel-remove" data-rm="'+idx+'" aria-label="'+t('btn.remove')+'"><svg viewBox="0 0 24 24" class="ic"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>':'';}).join('')||'<p class="sub">'+t('state.empty_body')+'</p>')+'</div></div>';
-  const meters='<div class="jar-section"><h3>'+t('derived.capacity')+'</h3>'+meter(t('enum.layer_form.bush'),D.buckets.upright_trailing)+meter(t('enum.layer_form.carpet'),D.buckets.groundcover)+'</div>';
-  const actions='<div class="jar-actions"><button class="btn primary" id="careBtn"'+(bl.length?' disabled':'')+'>'+t('btn.finalize')+'</button><button class="btn ghost" id="saveBtn">'+t('btn.save')+'</button><button class="btn ghost" id="shareBtn">'+t('btn.copy_link')+'</button><button class="btn ghost" id="aiBtn">'+t('btn.check_ai')+'</button><button class="btn ghost wide" id="dlCareBtn"'+(bl.length?' disabled':'')+'>'+L('btn.download_care','Скачать памятку','Download care guide')+'</button></div>';
-  const issueHtml=h=>'<div class="issue '+h.sev+'"><div class="issue-head">'+sev(h.sev)+'</div><div>'+t('rules.'+h.id+'.msg',h.vars)+'</div><div class="issue-remedy">'+t('rules.'+h.id+'.remedy',h.vars)+'</div></div>';
-  const issuesBody=hits.length?['block','warning','info'].map(s=>{const g=hits.filter(h=>h.sev===s);return g.length?'<div class="jar-section"><h3>'+sev(s)+' · '+g.length+'</h3>'+g.map(issueHtml).join('')+'</div>':'';}).join(''):'<div class="empty small"><div class="empty-orb"></div><p>'+t('compat.all_good')+'</p></div>';
-  const N=DB.norms,ch=(N.layers.charcoal&&N.layers.charcoal.thickness_cm)?N.layers.charcoal.thickness_cm[0]:0.5;
-  const detailsBody='<div class="jar-section"><h3>'+t('step.review')+'</h3><div class="ph-chips"><span class="ph-chip">'+fmt(D.volume)+' '+t('units.l')+'</span><span class="ph-chip">'+fmt(D.footprint)+' '+t('units.cm2')+'</span><span class="ph-chip">'+fmt(D.freeHeight)+' '+t('units.cm')+'</span></div></div>'+
-    '<div class="jar-section"><h3>'+t('derived.ph_corridor')+'</h3><div class="ph-chips">'+(D.ph.map(z=>'<span class="ph-chip">'+enumT('ph_zone',z)+'</span>').join('')||'<span class="sub">—</span>')+'</div></div>'+
-    '<div class="jar-section"><h3>'+L('jar.layers','Слои','Layers')+'</h3><dl class="kv"><dt>'+t('bom.drainage')+'</dt><dd>'+fmt(D.drainage)+' '+t('units.cm')+'</dd><dt>'+t('bom.separator')+'</dt><dd>0.3 '+t('units.cm')+'</dd><dt>'+t('bom.charcoal')+'</dt><dd>'+fmt(ch)+' '+t('units.cm')+'</dd><dt>'+t('bom.substrate')+'</dt><dd>'+fmt(D.depth)+' '+t('units.cm')+'</dd></dl></div>'+
-    (sub?'<div class="jar-section"><h3>'+nm(sub)+'</h3><p class="sub">'+sub.recipe.map(r=>Math.round(r.pct)+'% '+compName(r.component)).join(' · ')+'</p></div>':'');
-  panel.innerHTML=tabsHtml+'<div class="jar-tab-body"><div data-jarbody="build" class="'+(tab==='build'?'on':'')+'">'+verdict+list+meters+actions+'</div><div data-jarbody="issues" class="'+(tab==='issues'?'on':'')+'">'+issuesBody+'</div><div data-jarbody="details" class="'+(tab==='details'?'on':'')+'">'+detailsBody+'</div></div>';
-  if(pv)panel.prepend(pv);
+
+/* ── setup ── */
+function renderSetup(){
+  const v=state.vessel,ps=DB.vessels.presets;
+  const card=(title,icon,inner)=>'<div class="setup-card"><h3>'+icon+title+'</h3>'+inner+'</div>';
+  const row=(label,inner,val)=>'<div class="row"><div class="row-label"><span>'+label+'</span>'+(val?'<span class="row-val">'+val+'</span>':'')+'</div>'+inner+'</div>';
+  $('#setupBody').innerHTML=
+    card(tabLabel('build')+' · '+t('step.vessel'),ICON.build,
+      row(t('step.vessel'),'<select class="select" style="width:100%" id="vesselSelect">'+ps.map(p=>'<option value="'+p.id+'"'+(p.id===v.preset?' selected':'')+'>'+nm(p)+' · '+fmt(p.volume_liters_approx)+' '+t('units.l')+'</option>').join('')+(v.preset==='custom'?'<option value="custom" selected>'+L('vessel.custom','Своя ёмкость','Custom vessel')+'</option>':'')+'</select>')+
+      row(t('derived.volume'),'<input class="range" id="volRange" type="range" min="1" max="15" step="0.5">','<span id="volVal"></span>')+
+      row(t('input.height'),'<input class="range" id="hRange" type="range" min="8" max="45" step="1">','<span id="hVal"></span>'))+
+    card(t('input.system'),ICON.setup,
+      row(t('input.system'),'<div class="seg">'+['closed','semi','open'].map(s=>'<button data-sys="'+s+'" class="'+(state.system===s?'on':'')+'">'+enumT('system_type',s)+'</button>').join('')+'</div>')+
+      row(t('input.experience'),'<div class="seg">'+['beginner','experienced'].map(e=>'<button data-exp="'+e+'" class="'+(state.experience===e?'on':'')+'">'+enumT('experience',e)+'</button>').join('')+'</div>')+
+      [['grow','input.grow_light'],['winter','input.wintering'],['water','input.open_water']].map(x=>'<label class="toggle-row"><span>'+t(x[1])+'</span><span class="sw"><input type="checkbox" data-flag="'+x[0]+'"'+(state.flags[x[0]]?' checked':'')+'><i></i></span></label>').join(''))+
+    card(t('input.placement'),ICON.care,
+      row(t('input.placement'),'<select class="select" style="width:100%" id="placeSelect">'+DB.criteria.enums.placement.values.map(p=>'<option value="'+p+'"'+(p===state.placement?' selected':'')+'>'+enumT('placement',p)+'</option>').join('')+'</select>')+
+      row(t('input.water'),'<select class="select" style="width:100%" id="waterSelect">'+DB.criteria.enums.water_type.values.map(w=>'<option value="'+w+'"'+(w===state.water?' selected':'')+'>'+enumT('water_type',w)+'</option>').join('')+'</select>')+
+      row(t('input.style'),'<select class="select" style="width:100%" id="styleSelect"><option value="">—</option>'+DB.styles.styles.map(s=>'<option value="'+s.id+'"'+(s.id===state.style?' selected':'')+'>'+t('styles.'+s.id+'.name')+'</option>').join('')+'</select>')+
+      '<p class="sub" style="margin-top:9px">'+t('input.hint_placement')+'</p>')+
+    card(t('step.hardscape'),ICON.plants,
+      row(L('setup.stone','Камень','Stone'),'<select class="select" style="width:100%" id="stoneSelect"><option value="">'+(lang==='ru'?'Добавить…':'Add…')+'</option>'+DB.materials.stones.map(s=>'<option value="'+s.id+'">'+nm(s)+'</option>').join('')+'</select>')+
+      row(L('setup.decor','Декор','Decor'),'<select class="select" style="width:100%" id="decorSelect"><option value="">'+(lang==='ru'?'Добавить…':'Add…')+'</option>'+DB.materials.decor.map(s=>'<option value="'+s.id+'">'+nm(s)+'</option>').join('')+'</select>')+
+      '<div class="mat-chips">'+state.stones.map(id=>{const s=DB.materials.stones.find(x=>x.id===id);return s?'<button class="mat-chip" data-rm-stone="'+id+'">'+nm(s)+' ×</button>':'';}).join('')+state.decor.map(id=>{const s=DB.materials.decor.find(x=>x.id===id);return s?'<button class="mat-chip" data-rm-decor="'+id+'">'+nm(s)+' ×</button>':'';}).join('')+'</div>')+
+    card(t('bom.substrate'),ICON.care,
+      row(L('setup.substrate','Субстрат','Substrate'),'<select class="select" style="width:100%" id="subSelect">'+DB.materials.substrates.map(s=>'<option value="'+s.id+'"'+(s.id===currentSub()?' selected':'')+'>'+nm(s)+'</option>').join('')+'</select>')+
+      (subObj()?'<p class="sub">'+subObj().recipe.map(r=>Math.round(r.pct)+'% '+compName(r.component)).join(' · ')+'</p>':''));
+  syncSetupValues();
 }
-function renderMobile(){$('#mobileBar').innerHTML='<button class="btn ghost" data-view="builder">'+t('nav.builder')+'</button><button class="btn ghost" data-view="care">'+t('nav.care')+'</button><button class="btn ghost" data-view="saved">'+t('nav.saved')+'</button><button class="btn primary" id="mobileVerdict">'+t('btn.finalize')+'</button>';}
+function syncSetupValues(){
+  const vr=$('#volRange'),hr=$('#hRange');if(!vr||!D)return;
+  vr.value=Math.min(15,Math.max(1,D.volume));vr.style.setProperty('--p',((vr.value-1)/14*100)+'%');
+  hr.value=state.vessel.height;hr.style.setProperty('--p',((hr.value-8)/37*100)+'%');
+  const a=$('#volVal'),b=$('#hVal');if(a)a.textContent=fmt(D.volume)+' '+t('units.l');if(b)b.textContent=state.vessel.height+' '+t('units.cm');
+}
+
+/* ── care ── */
 function matchFilter(o,f){if(f.trim_interval_weeks_not_null)return o.trim_interval_weeks!=null;if(f.feeding)return o.feeding===f.feeding;if(f.starter_count_not_null)return o.starter_count!=null;return true;}
-function currentLightKey(){return D.corridors.light[0]||'bright_indirect';}
-function careVars(tpl,item){const P=selP(),F=selF(),N=DB.norms,sub=subObj(),names=a=>a.map(nm).join(', '),lk=currentLightKey();const v={stone_names:names(stones()),days:'3–5',components:sub?sub.recipe.map(r=>compName(r.component)).join(', '):'',lead_time_weeks:N.fauna_defaults.cleanup_crew_lead_time_weeks.join('–'),layer_order:DB.materials.meta.layer_order.join(' → '),dose_ml:N.water.closed_calibration_dose_ml_per_3l.join('–'),recheck_hours:N.water.closed_calibration_recheck_hours,placement_label:enumT('placement',state.placement),photoperiod_h:N.light_norms.photoperiod_hours[lk].join('–'),distance_cm:N.light_norms.led_distance_cm.join('–'),boost_h:N.light_norms.winter_boost_hours,interval_weeks:currentSub()==='succulent_mineral'?N.water.open_succulent_interval_weeks.join('–'):N.water.open_tropical_interval_weeks.join('–'),tray_cm:'1–2',normal:t('norms.condensation.normal'),over_sign:t('norms.condensation.over_sign'),over_action:t('norms.condensation.over_action'),under_sign:t('norms.condensation.under_sign'),under_action:t('norms.condensation.under_action'),schedule:state.system==='closed'?t('norms.ventilation.closed_schedule'):t('norms.ventilation.semi_schedule'),months:N.seasonal.wintering_months_default.join(', '),temp_c:'10–15',refresh_weeks:N.maintenance.litter_refresh_interval_weeks.join('–'),drainage_l:fmt(D.footprint*D.drainage/1000),substrate_l:fmt(D.footprint*D.depth/1000),charcoal_ml:Math.round(D.volume*15),substrate_name:sub?nm(sub):'',ppfd_range:N.light_norms.ppfd_umol_m2_s[lk].join('–'),species:names(P)};if(item){v.name=nm(item);v.species=nm(item);v.interval_weeks=item.trim_interval_weeks;v.mechanism=enumT('spread_mechanism',item.spread_mechanism||'none');v.interval_days=item.feeding_plan?item.feeding_plan.interval_days:7;v.items=item.feeding_plan?item.feeding_plan.items.join(', '):'';v.count_min=item.starter_count?item.starter_count.min:'';v.count_recommended=item.starter_count?item.starter_count.recommended:'';}return v;}
-function cond(c){if(!c||c.always)return true;const P=selP(),F=selF();return Object.keys(c).every(k=>{const val=c[k];switch(k){case 'system_in':return val.includes(state.system);case 'substrate_in':return val.includes(currentSub());case 'any_plant':return P.some(p=>Object.keys(val).every(f=>p[f]===val[f]));case 'any_plant_flag':return P.some(p=>p[val]);case 'any_plant_habitat':return P.some(p=>p.habitat.includes(val));case 'any_fauna':return F.some(x=>Object.keys(val).every(f=>x[f]===val[f]));case 'any_fauna_role':return F.some(x=>x.role.some(r=>val.includes(r)));case 'no_fauna_role':return !F.some(x=>x.role.some(r=>val.includes(r)));case 'input_flag':return val==='has_grow_light_false'?!state.flags.grow:!!state.flags[{has_open_water:'water',has_wintering:'winter',has_grow_light:'grow'}[val]];case 'input_is':return state[val.field]===val.value;case 'light_corridor_has':return D.corridors.light.includes(val);case 'stone_any':return stones().some(s=>Object.keys(val).every(f=>s[f]===val[f]));case 'stone_prep_has':return stones().some(s=>(s.prep||[]).includes(val));case 'decor_any':return decor().some(d=>Object.keys(val).every(f=>d[f]===val[f]));default:return true;}});}
-function careBlocks(){const P=selP(),F=selF(),out=[];DB.care_templates.templates.forEach(tpl=>{if(tpl.foreach){(tpl.foreach==='plants'?P:F).filter(o=>!tpl.filter||matchFilter(o,tpl.filter)).forEach(o=>out.push({tpl:tpl,vars:careVars(tpl,o)}));}else if(cond(tpl.when))out.push({tpl:tpl,vars:careVars(tpl)});});return out;}
+const lightKey=()=>D.corridors.light[0]||'bright_indirect';
+function careVars(tpl,item){
+  const P=selP(),N=DB.norms,sub=subObj(),names=a=>a.map(nm).join(', '),lk=lightKey();
+  const v={stone_names:names(stones()),days:'3–5',components:sub?sub.recipe.map(r=>compName(r.component)).join(', '):'',lead_time_weeks:N.fauna_defaults.cleanup_crew_lead_time_weeks.join('–'),layer_order:DB.materials.meta.layer_order.join(' → '),dose_ml:N.water.closed_calibration_dose_ml_per_3l.join('–'),recheck_hours:N.water.closed_calibration_recheck_hours,placement_label:enumT('placement',state.placement),photoperiod_h:N.light_norms.photoperiod_hours[lk].join('–'),distance_cm:N.light_norms.led_distance_cm.join('–'),boost_h:N.light_norms.winter_boost_hours,interval_weeks:currentSub()==='succulent_mineral'?N.water.open_succulent_interval_weeks.join('–'):N.water.open_tropical_interval_weeks.join('–'),tray_cm:'1–2',normal:t('norms.condensation.normal'),over_sign:t('norms.condensation.over_sign'),over_action:t('norms.condensation.over_action'),under_sign:t('norms.condensation.under_sign'),under_action:t('norms.condensation.under_action'),schedule:state.system==='closed'?t('norms.ventilation.closed_schedule'):t('norms.ventilation.semi_schedule'),months:N.seasonal.wintering_months_default.join(', '),temp_c:'10–15',refresh_weeks:N.maintenance.litter_refresh_interval_weeks.join('–'),drainage_l:fmt(D.footprint*D.drainage/1000),substrate_l:fmt(D.footprint*D.depth/1000),charcoal_ml:Math.round(D.volume*15),substrate_name:sub?nm(sub):'',ppfd_range:N.light_norms.ppfd_umol_m2_s[lk].join('–'),species:names(P)};
+  if(item){v.name=nm(item);v.species=nm(item);v.interval_weeks=item.trim_interval_weeks;v.mechanism=enumT('spread_mechanism',item.spread_mechanism||'none');v.interval_days=item.feeding_plan?item.feeding_plan.interval_days:7;v.items=item.feeding_plan?item.feeding_plan.items.join(', '):'';v.count_min=item.starter_count?item.starter_count.min:'';v.count_recommended=item.starter_count?item.starter_count.recommended:'';}
+  return v;
+}
+function cond(c){
+  if(!c||c.always)return true;const P=selP(),F=selF();
+  return Object.keys(c).every(k=>{const val=c[k];switch(k){
+    case 'system_in':return val.includes(state.system);
+    case 'substrate_in':return val.includes(currentSub());
+    case 'any_plant':return P.some(p=>Object.keys(val).every(f=>p[f]===val[f]));
+    case 'any_plant_flag':return P.some(p=>p[val]);
+    case 'any_plant_habitat':return P.some(p=>p.habitat.includes(val));
+    case 'any_fauna':return F.some(x=>Object.keys(val).every(f=>x[f]===val[f]));
+    case 'any_fauna_role':return F.some(x=>x.role.some(r=>val.includes(r)));
+    case 'no_fauna_role':return !F.some(x=>x.role.some(r=>val.includes(r)));
+    case 'input_flag':return val==='has_grow_light_false'?!state.flags.grow:!!state.flags[{has_open_water:'water',has_wintering:'winter',has_grow_light:'grow'}[val]];
+    case 'input_is':return state[val.field]===val.value;
+    case 'light_corridor_has':return D.corridors.light.includes(val);
+    case 'stone_any':return stones().some(s=>Object.keys(val).every(f=>s[f]===val[f]));
+    case 'stone_prep_has':return stones().some(s=>(s.prep||[]).includes(val));
+    case 'decor_any':return decor().some(d=>Object.keys(val).every(f=>d[f]===val[f]));
+    default:return true;}});
+}
+function careBlocks(){const P=selP(),F=selF(),out=[];DB.care_templates.templates.forEach(tpl=>{if(tpl.foreach){(tpl.foreach==='plants'?P:F).filter(o=>!tpl.filter||matchFilter(o,tpl.filter)).forEach(o=>out.push({tpl,vars:careVars(tpl,o)}));}else if(cond(tpl.when))out.push({tpl,vars:careVars(tpl)});});return out;}
 function renderCare(){
   const preset=DB.vessels.presets.find(v=>v.id===state.vessel.preset);
   $('#careSub').textContent=(preset?nm(preset):L('vessel.custom','Своя ёмкость','Custom vessel'))+' · '+enumT('system_type',state.system)+' · '+fmt(D.volume)+' '+t('units.l');
+  $('#careSubtabs').innerHTML=[['sheet',L('care.sheet','Памятка','Care sheet')],['diag',t('nav.diag')]].map(x=>'<button data-ctab="'+x[0]+'" class="'+(state.careTab===x[0]?'on':'')+'" role="tab" aria-selected="'+(state.careTab===x[0])+'">'+x[1]+'</button>').join('');
+  const body=$('#careBody');
+  if(state.careTab==='diag'){
+    body.innerHTML=DB.diagnostics.symptoms.map(s=>{const cs=s.causes.map(c=>Object.assign({},c,{score:c.base_weight+c.boosts.reduce((a,b)=>a+(cond(b.when)?b.add:0),0)})).sort((a,b)=>b.score-a.score).slice(0,3);
+      return '<div class="diag-item"><button class="diag-q" data-diag="'+s.id+'"><span>'+t('diag.'+s.id+'.name')+'</span>'+ICON.chev+'</button><div class="diag-a">'+cs.map(c=>'<div class="cause"><div class="cause-title">'+t(c.cause_key)+'</div><div class="cause-fix">'+t(c.fix_key)+'</div><div class="cause-prev">'+t(c.prevention_key)+'</div></div>').join('')+'</div></div>';}).join('');
+    return;
+  }
   const blocks=careBlocks();
-  const toolbar='<div class="care-toolbar"><button class="btn primary" id="dlCareBtn2">'+L('btn.download_care','Скачать памятку','Download care guide')+'</button><button class="btn ghost" id="printCareBtn">'+L('btn.print','Печать / PDF','Print / PDF')+'</button></div>';
-  const body=DB.care_templates.sections.map(sec=>{const bs=blocks.filter(b=>b.tpl.section===sec.id);return bs.length?'<div class="care-card"><h3>'+t('care.section.'+sec.id)+'</h3>'+bs.map(b=>'<div class="care-item">'+t(b.tpl.text_key,b.vars)+'<span class="why">'+b.tpl.source+'</span></div>').join('')+'</div>':'';}).join('');
-  $('#careContent').innerHTML=toolbar+(body||'<div class="empty"><div class="empty-orb"></div><h3>'+L('state.empty_care_title','Памятка пуста','No care notes')+'</h3><p class="sub">'+L('state.empty_care_text','Добавьте растения — советы появятся автоматически.','Add plants and the tips will appear.')+'</p></div>');
+  const toolbar='<div class="care-toolbar"><button class="btn primary" id="dlCareBtn">'+L('btn.download_care','Скачать памятку','Download care guide')+'</button><button class="btn ghost" id="printCareBtn">'+L('btn.print','Печать / PDF','Print / PDF')+'</button></div>';
+  const cards=DB.care_templates.sections.map(sec=>{const bs=blocks.filter(b=>b.tpl.section===sec.id);return bs.length?'<div class="care-card"><h3>'+t('care.section.'+sec.id)+'</h3>'+bs.map(b=>'<div class="care-item">'+t(b.tpl.text_key,b.vars)+'<span class="why">'+b.tpl.source+'</span></div>').join('')+'</div>':'';}).join('');
+  body.innerHTML='<div class="care-grid">'+toolbar+(cards||'<div class="empty"><div class="empty-orb"></div><h3>'+L('state.empty_care_title','Памятка пуста','No care notes')+'</h3><p class="sub">'+L('state.empty_care_text','Добавьте растения — советы появятся автоматически.','Add plants and the tips will appear.')+'</p><button class="btn ghost" data-go="plants">'+t('state.empty_action')+'</button></div>')+'</div>';
 }
 function careText(){
   const P=selP(),F=selF(),preset=DB.vessels.presets.find(v=>v.id===state.vessel.preset),sub=subObj(),out=[];
@@ -242,86 +376,122 @@ function careText(){
   out.push(t('input.placement')+': '+enumT('placement',state.placement)+'  |  '+t('input.water')+': '+enumT('water_type',state.water));
   out.push(t('bom.substrate')+': '+(sub?nm(sub):'—'));
   const hs=stones().concat(decor()).map(nm);if(hs.length)out.push(t('step.hardscape')+': '+hs.join(', '));
-  out.push('');out.push(t('step.plants')+':');
-  P.forEach(p=>out.push('  - '+nm(p)+' ('+p.name_latin+')'));
+  out.push('');out.push(t('step.plants')+':');P.forEach(p=>out.push('  - '+nm(p)+' ('+p.name_latin+')'));
   if(F.length){out.push('');out.push(t('step.fauna')+':');F.forEach(f=>out.push('  - '+nm(f)+' ('+f.name_latin+')'));}
   const blocks=careBlocks();
   DB.care_templates.sections.forEach(sec=>{const bs=blocks.filter(b=>b.tpl.section===sec.id);if(!bs.length)return;out.push('');out.push('--- '+t('care.section.'+sec.id).toUpperCase()+' ---');bs.forEach(b=>out.push('* '+t(b.tpl.text_key,b.vars)));});
   out.push('');out.push(new Date().toLocaleDateString(lang==='ru'?'ru-RU':'en-US')+' · '+L('care.generated','Сгенерировано Florarium Combinator','Generated by Florarium Combinator'));
   return out.join('\n');
 }
-function downloadCareGuide(){const blob=new Blob([careText()],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='florarium-care-'+Date.now()+'.txt';a.click();URL.revokeObjectURL(a.href);toast(L('toast.care_downloaded','Памятка скачана','Care guide downloaded'));}
-function printCare(){if(state.view!=='care')setView('care');setTimeout(()=>window.print(),150);}
-function renderDiag(){$('#diagSub').textContent=lang==='ru'?'Причины ранжируются под вашу сборку':'Causes ranked for your build';$('#diagContent').innerHTML=DB.diagnostics.symptoms.map(s=>{const causes=s.causes.map(c=>Object.assign({},c,{score:c.base_weight+c.boosts.reduce((a,b)=>a+(cond(b.when)?b.add:0),0)})).sort((a,b)=>b.score-a.score).slice(0,3);return '<div class="diag-item"><button class="diag-q" data-diag="'+s.id+'"><span>'+t('diag.'+s.id+'.name')+'</span></button><div class="diag-a">'+causes.map(c=>'<div class="cause"><div class="cause-title">'+t(c.cause_key)+'</div><div class="cause-fix">'+t(c.fix_key)+'</div><div class="cause-prev">'+t(c.prevention_key)+'</div></div>').join('')+'</div></div>';}).join('');}
-function renderSaved(){const a=store.all();$('#savedContent').innerHTML=a.length?a.map(b=>'<div class="saved-card"><h3>'+esc(b.name)+'</h3><div class="saved-meta">'+new Date(b.created).toLocaleDateString(lang==='ru'?'ru-RU':'en-US')+' · '+b.state.items.length+' '+t('units.pcs')+'</div><div class="saved-actions"><button class="btn primary" data-load="'+b.id+'">'+t('btn.load')+'</button><button class="btn ghost" data-del="'+b.id+'">'+t('btn.delete')+'</button></div></div>').join(''):'<div class="empty"><div class="empty-orb"></div><h3>'+L('state.empty_saved_title','Пока нет сохранённых банок','No saved jars yet')+'</h3><p class="sub">'+L('state.empty_saved_text','Соберите композицию и нажмите «Сохранить сборку».','Build a composition and press “Save build”.')+'</p><button class="btn ghost" data-view="builder">'+t('nav.builder')+'</button></div>';}
+function downloadCare(){const b=new Blob([careText()],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='florarium-care-'+Date.now()+'.txt';a.click();URL.revokeObjectURL(a.href);toast(L('toast.care_downloaded','Памятка скачана','Care guide downloaded'));}
+function printCare(){if(state.tab!=='care'){state.tab='care';state.careTab='sheet';render();}setTimeout(()=>window.print(),180);}
 
-function openDrawer(o){const im=o.image||{},note=t('notes.'+o.id),kv=(l,v)=>v?'<dt>'+l+'</dt><dd>'+v+'</dd>':'';$('#drawerBody').innerHTML=imgHTML(o,'drawer-photo')+'<h2 id="drawerTitle">'+nm(o)+'</h2><div class="latin">'+o.name_latin+'</div><div class="drawer-tags"><span class="tag care">'+t('group.'+o.group)+'</span>'+(o.size?'<span class="tag size">'+enumT('size',o.size)+'</span>':'')+(o.care_level?'<span class="tag light">'+enumT('care_level',o.care_level)+'</span>':'')+'</div>'+(note!=='notes.'+o.id?'<div class="drawer-note">'+note+'</div>':'')+'<dl class="kv">'+kv(t('input.system'),(o.system_type||[]).map(x=>enumT('system_type',x)).join(', '))+kv(FL.light[lang],(o.light||[]).map(x=>enumT('light',x)).join(', '))+kv(FL.air_humidity[lang],(o.air_humidity||[]).map(x=>enumT('air_humidity',x)).join(', '))+kv(FL.soil_humidity[lang],(o.soil_humidity||[]).map(x=>enumT('soil_humidity',x)).join(', '))+kv(FL.temperature[lang],(o.temperature||[]).map(x=>enumT('temperature',x)).join(', '))+(o.role?kv(t('step.fauna'),o.role.map(x=>enumT('fauna_role',x)).join(', ')):'')+'</dl><div class="drawer-links"><a class="btn ghost" target="_blank" rel="noopener" href="https://www.google.com/search?tbm=isch&q='+encodeURIComponent(o.name_latin)+'">'+t('caption.search_google')+'</a><a class="btn ghost" target="_blank" rel="noopener" href="https://yandex.ru/images/search?text='+encodeURIComponent(o.name_latin)+'">'+t('caption.search_yandex')+'</a></div><div class="credit">'+(im.attribution||(im.author?t('caption.credit',{author:im.author,license:im.license})+' · <a href="'+im.source_url+'" target="_blank" rel="noopener">'+t('caption.source')+'</a>':t('caption.illustration')))+'</div><button class="btn primary" style="width:100%;margin-top:18px" data-add="'+o.id+'">'+(state.items.some(i=>i.id===o.id)?t('btn.remove'):t('btn.add'))+'</button>';show('drawer');}
-function show(id){$('#'+id).classList.remove('hidden');$('#'+(id==='drawer'?'drawerScrim':id==='saveModal'?'saveScrim':'aiScrim')).classList.remove('hidden');}
-function hide(id){$('#'+id).classList.add('hidden');$('#'+(id==='drawer'?'drawerScrim':id==='saveModal'?'saveScrim':'aiScrim')).classList.add('hidden');}
-function toast(msg,undo){const el=document.createElement('div');el.className='toast';el.innerHTML='<span>'+esc(msg)+'</span>'+(undo?'<button type="button">'+(lang==='ru'?'Вернуть':'Undo')+'</button>':'');$('#toasts').append(el);if(undo)el.querySelector('button').onclick=()=>{undo();el.remove();};setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(10px)';setTimeout(()=>el.remove(),250);},undo?6000:3000);}
-function aiPrompt(){const P=selP(),F=selF(),pl=p=>t('ai.plant_line',{name_ru:p.name_ru,latin:p.name_latin,layer:p.layer_form.map(x=>enumT('layer_form',x)).join('/'),growth:enumT('growth_rate',p.growth_rate),air:p.air_humidity.map(x=>enumT('air_humidity',x)).join('/'),cond:enumT('condensation',p.condensation)}),fa=f=>t('ai.fauna_line',{name_ru:f.name_ru,role:f.role.map(x=>enumT('fauna_role',x)).join('/'),interest:enumT('plant_interest',f.plant_interest)});let s=t('ai.prompt',{volume:fmt(D.volume),system:enumT('system_type',state.system),shape:enumT('vessel_shape',state.vessel.shape),placement:enumT('placement',state.placement),water:enumT('water_type',state.water),substrate:subObj()?nm(subObj()):'—',hardscape:stones().concat(decor()).map(nm).join(', ')||'—',plants:P.map(pl).join('\n')||'—',fauna:F.map(fa).join('\n')||'—'});return s.length>2000?s.slice(0,1997)+'…':s;}
-function openAI(){$('#aiPrompt').value=aiPrompt();$('#aiHint').textContent=t('toast.ai_copied');$('#aiTargets').innerHTML='<button class="ai-target" data-ai="google">'+t('ai.target_google')+'</button><button class="ai-target" data-ai="perplexity">'+t('ai.target_perplexity')+'</button>';show('aiModal');}
+/* ── rail ── */
+function renderRail(hits){
+  const rail=$('#railBody');if(!rail)return;
+  const bl=hits.filter(h=>h.sev==='block').length,wa=hits.filter(h=>h.sev==='warning').length;
+  const lvl=bl?'block':wa?'warn':'ok';
+  const title=bl?t('compat.blocks_title'):wa?t('compat.warnings_title'):t('compat.all_good');
+  rail.innerHTML='<div class="rail-head"><span class="rail-orb '+lvl+'"></span><span><span class="rail-title">'+title+'</span><span class="rail-note">'+fmt(D.volume)+' '+t('units.l')+' · '+selP().length+'+'+selF().length+'</span></span></div>'+
+    '<div class="rail-list">'+(state.items.map((it,i)=>{const o=obj(it);return o?'<div class="rail-row">'+imgHTML(o)+'<span>'+nm(o)+'</span><button class="sel-x" data-rm="'+i+'" aria-label="'+t('btn.remove')+'">'+ICON.x+'</button></div>':'';}).join('')||'<p class="sub">'+t('state.empty_body')+'</p>')+'</div>'+
+    (bl||wa?'<div class="issue '+(bl?'block':'warning')+'"><div class="issue-head">'+(bl?bl+' '+t('severity.block').toLowerCase():wa+' '+t('severity.warning').toLowerCase())+'</div><div class="issue-remedy">'+t('rules.'+(hits.find(h=>h.sev===(bl?'block':'warning'))||hits[0]).id+'.msg',(hits.find(h=>h.sev===(bl?'block':'warning'))||hits[0]).vars)+'</div></div>':'')+
+    '<div class="rail-actions"><button class="btn primary wide" data-go="build">'+L('rail.open','Открыть сборку','Open build')+'</button><button class="btn ghost" id="saveBtn">'+t('btn.save')+'</button><button class="btn ghost" id="shareBtn">'+t('btn.copy_link')+'</button></div>';
+}
+
+/* ── sheet / modal / toast ── */
+function openSheet(o){
+  const im=o.image||{},note=t('notes.'+o.id),kv=(l,v)=>v?'<dt>'+l+'</dt><dd>'+v+'</dd>':'';
+  $('#sheetBody').innerHTML=imgHTML(o,'sheet-photo')+'<h2 id="sheetTitle">'+nm(o)+'</h2><div class="latin">'+o.name_latin+'</div><div class="tags"><span class="tag care">'+t('group.'+o.group)+'</span>'+(o.size?'<span class="tag size">'+enumT('size',o.size)+'</span>':'')+(o.care_level?'<span class="tag light">'+enumT('care_level',o.care_level)+'</span>':'')+'</div>'+(note!=='notes.'+o.id?'<div class="sheet-note">'+note+'</div>':'')+
+    '<dl class="kv">'+kv(t('input.system'),(o.system_type||[]).map(x=>enumT('system_type',x)).join(', '))+kv(FL.light[lang],(o.light||[]).map(x=>enumT('light',x)).join(', '))+kv(FL.air_humidity[lang],(o.air_humidity||[]).map(x=>enumT('air_humidity',x)).join(', '))+kv(FL.soil_humidity[lang],(o.soil_humidity||[]).map(x=>enumT('soil_humidity',x)).join(', '))+kv(FL.temperature[lang],(o.temperature||[]).map(x=>enumT('temperature',x)).join(', '))+(o.role?kv(t('step.fauna'),o.role.map(x=>enumT('fauna_role',x)).join(', ')):'')+'</dl>'+
+    '<div class="sheet-links"><a class="btn ghost" target="_blank" rel="noopener" href="https://www.google.com/search?tbm=isch&q='+encodeURIComponent(o.name_latin)+'">'+t('caption.search_google')+'</a><a class="btn ghost" target="_blank" rel="noopener" href="https://yandex.ru/images/search?text='+encodeURIComponent(o.name_latin)+'">'+t('caption.search_yandex')+'</a></div>'+
+    '<div class="credit">'+(im.attribution||(im.author?t('caption.credit',{author:im.author,license:im.license})+' · <a href="'+im.source_url+'" target="_blank" rel="noopener">'+t('caption.source')+'</a>':t('caption.illustration')))+'</div>'+
+    '<button class="btn primary" style="width:100%;margin-top:16px" data-add="'+o.id+'">'+(state.items.some(i=>i.id===o.id)?t('btn.remove'):t('btn.add'))+'</button>';
+  $('#sheet').classList.remove('hidden');$('#scrim').classList.remove('hidden');
+}
+function closeAll(){['sheet','saveModal','aiModal'].forEach(id=>$('#'+id).classList.add('hidden'));$('#scrim').classList.add('hidden');}
+function openModal(id){$('#'+id).classList.remove('hidden');$('#scrim').classList.remove('hidden');}
+function toast(msg,undo){const el=document.createElement('div');el.className='toast';el.innerHTML='<span>'+esc(msg)+'</span>'+(undo?'<button type="button">'+(lang==='ru'?'Вернуть':'Undo')+'</button>':'');$('#toasts').append(el);if(undo)el.querySelector('button').onclick=()=>{undo();el.remove();};setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(10px)';setTimeout(()=>el.remove(),250);},undo?7000:3200);}
+function aiPrompt(){
+  const P=selP(),F=selF(),pl=p=>t('ai.plant_line',{name_ru:p.name_ru,latin:p.name_latin,layer:p.layer_form.map(x=>enumT('layer_form',x)).join('/'),growth:enumT('growth_rate',p.growth_rate),air:p.air_humidity.map(x=>enumT('air_humidity',x)).join('/'),cond:enumT('condensation',p.condensation)}),fa=f=>t('ai.fauna_line',{name_ru:f.name_ru,role:f.role.map(x=>enumT('fauna_role',x)).join('/'),interest:enumT('plant_interest',f.plant_interest)});
+  let s=t('ai.prompt',{volume:fmt(D.volume),system:enumT('system_type',state.system),shape:enumT('vessel_shape',state.vessel.shape),placement:enumT('placement',state.placement),water:enumT('water_type',state.water),substrate:subObj()?nm(subObj()):'—',hardscape:stones().concat(decor()).map(nm).join(', ')||'—',plants:P.map(pl).join('\n')||'—',fauna:F.map(fa).join('\n')||'—'});
+  return s.length>2000?s.slice(0,1997)+'…':s;
+}
 async function copyText(s){try{await navigator.clipboard.writeText(s);return true;}catch(e){const ta=document.createElement('textarea');ta.value=s;document.body.append(ta);ta.select();try{document.execCommand('copy');}catch(x){}ta.remove();return true;}}
 
-function update(){D=derive();const hits=evaluate();if(state.view==='builder'){renderCatalog();renderJar(hits);syncRanges();}if(state.view==='care')renderCare();if(state.view==='diag')renderDiag();if(state.view==='saved')renderSaved();renderMobile();}
-function setView(v){state.view=v;$$('.view').forEach(x=>x.classList.add('hidden'));const el=$('#view-'+v);if(el)el.classList.remove('hidden');$$('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===v));update();window.scrollTo({top:0,behavior:'smooth'});}
-function addItem(id){const o=DB.plants.concat(DB.fauna).find(x=>x.id===id);if(!o)return;const idx=state.items.findIndex(i=>i.id===id);if(idx>=0){removeItem(idx);return;}state.items.push({kind:o.id.indexOf('plant_')===0?'plant':'fauna',id:id});update();toast(nm(o)+' ✓');}
-function removeItem(idx){const it=state.items[idx],o=obj(it);state.items.splice(idx,1);update();toast(nm(o)+' — '+t('btn.remove').toLowerCase(),()=>{state.items.splice(idx,0,it);update();});}
+/* ── mutations ── */
+function addItem(id){const o=DB.plants.concat(DB.fauna).find(x=>x.id===id);if(!o)return;const i=state.items.findIndex(x=>x.id===id);if(i>=0){removeItem(i);return;}state.items.push({kind:o.id.indexOf('plant_')===0?'plant':'fauna',id});render();toast(nm(o)+' ✓');}
+function removeItem(i){const it=state.items[i],o=obj(it);state.items.splice(i,1);render();toast(nm(o)+' — '+t('btn.remove').toLowerCase(),()=>{state.items.splice(i,0,it);render();});}
+function snapshot(){const s=state;return JSON.parse(JSON.stringify({items:s.items,stones:s.stones,decor:s.decor,substrate:s.substrate,vessel:s.vessel,system:s.system,placement:s.placement,water:s.water,experience:s.experience,style:s.style,flags:s.flags}));}
+function applyPreset(p){
+  const prev=snapshot(),all=DB.plants.concat(DB.fauna);
+  state.items=(p.items||[]).map(s=>{const o=all.find(x=>x.slug===s);return o?{kind:o.id.indexOf('plant_')===0?'plant':'fauna',id:o.id}:null;}).filter(Boolean);
+  state.stones=(p.stones||[]).slice();state.decor=(p.decor||[]).slice();state.substrate=p.substrate||null;
+  state.placement=p.placement;state.water=p.water;state.experience=p.experience;state.style=p.style||'';
+  state.flags=Object.assign({grow:false,winter:false,water:false},p.flags);
+  const pr=(DB.vessels.presets||[]).find(v=>v.id===p.vessel);if(pr)applyVesselPreset(pr);
+  state.system=p.system;state.tab='build';state.buildTab='composition';
+  render();toast(L('build.applied','Рецепт «{n}» собран','Recipe “{n}” applied').replace('{n}',nm(p)||p.name_ru),()=>{Object.assign(state,prev);render();});
+}
 
+/* ── events ── */
 document.addEventListener('click',async e=>{
-  const nav=e.target.closest('[data-view],[data-view-link]');if(nav){e.preventDefault();setView(nav.dataset.view||nav.dataset.viewLink);return;}
-  const add=e.target.closest('[data-add]');if(add){addItem(add.dataset.add);if(!$('#drawer').classList.contains('hidden'))hide('drawer');return;}
-  const open=e.target.closest('[data-open]');if(open&&!e.target.closest('button')){const o=DB.plants.concat(DB.fauna).find(x=>x.id===open.dataset.open);if(o)openDrawer(o);return;}
+  const go_=e.target.closest('[data-go]');if(go_){e.preventDefault();go(go_.dataset.go);return;}
+  const add=e.target.closest('[data-add]');if(add){addItem(add.dataset.add);if(!$('#sheet').classList.contains('hidden'))closeAll();return;}
+  const open=e.target.closest('[data-open]');if(open&&!e.target.closest('button')){const o=DB.plants.concat(DB.fauna).find(x=>x.id===open.dataset.open);if(o)openSheet(o);return;}
   const rm=e.target.closest('[data-rm]');if(rm){removeItem(+rm.dataset.rm);return;}
-  const tab=e.target.closest('[data-tab]');if(tab){state.filters.tab=tab.dataset.tab;state.filters.group='all';update();return;}
-  const gr=e.target.closest('[data-group]');if(gr){state.filters.group=gr.dataset.group;update();return;}
-  const sys=e.target.closest('[data-sys]');if(sys){state.system=sys.dataset.sys;renderConfig();update();return;}
-  const exp=e.target.closest('[data-exp]');if(exp){state.experience=exp.dataset.exp;renderConfig();update();return;}
-  const rs=e.target.closest('[data-rm-stone]');if(rs){state.stones=state.stones.filter(x=>x!==rs.dataset.rmStone);renderConfig();update();return;}
-  const rd=e.target.closest('[data-rm-decor]');if(rd){state.decor=state.decor.filter(x=>x!==rd.dataset.rmDecor);renderConfig();update();return;}
-  if(e.target.closest('#langBtn')){lang=lang==='ru'?'en':'ru';localStorage.setItem('flor.lang',lang);buildStatic();update();return;}
-  if(e.target.closest('#careBtn')||e.target.closest('#mobileVerdict')){setView('care');return;}
-  if(e.target.closest('#saveBtn')){$('#saveName').value='';show('saveModal');return;}
-  if(e.target.closest('#saveCancel')){hide('saveModal');return;}
-  if(e.target.closest('#saveConfirm')){store.save($('#saveName').value.trim()||t('saved.name_placeholder'));hide('saveModal');toast(t('toast.saved'));return;}
+  const bt=e.target.closest('[data-btab]');if(bt){state.buildTab=bt.dataset.btab;render();return;}
+  const ct=e.target.closest('[data-ctab]');if(ct){state.careTab=ct.dataset.ctab;render();return;}
+  const gr=e.target.closest('[data-group]');if(gr){const[k,g]=gr.dataset.group.split(':');state.filters[k].group=g;renderCatalog(k);return;}
+  const sh=e.target.closest('[data-showhidden]');if(sh){const k=sh.dataset.showhidden;state.filters[k].only=false;saveFilters();renderCatalog(k);return;}
+  const rs=e.target.closest('[data-reset]');if(rs){const k=rs.dataset.reset;state.filters[k]={group:'all',q:'',sort:'name',only:false};const q=$('#q-'+k);if(q)q.value='';saveFilters();renderCatalog(k);return;}
+  const sys=e.target.closest('[data-sys]');if(sys){state.system=sys.dataset.sys;render();return;}
+  const exp=e.target.closest('[data-exp]');if(exp){state.experience=exp.dataset.exp;render();return;}
+  const rstone=e.target.closest('[data-rm-stone]');if(rstone){state.stones=state.stones.filter(x=>x!==rstone.dataset.rmStone);render();return;}
+  const rdecor=e.target.closest('[data-rm-decor]');if(rdecor){state.decor=state.decor.filter(x=>x!==rdecor.dataset.rmDecor);render();return;}
+  const rec=e.target.closest('[data-recipe]');if(rec){const p=PRESETS.find(x=>x.id===rec.dataset.recipe);if(p)applyPreset(p);return;}
+  if(e.target.closest('#randRecipe')){if(PRESETS.length)applyPreset(PRESETS[Math.floor(Math.random()*PRESETS.length)]);return;}
+  if(e.target.closest('#themeBtn')){const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';try{localStorage.setItem('flor.theme',n);}catch(x){}applyTheme(n);return;}
+  if(e.target.closest('#langBtn')){lang=lang==='ru'?'en':'ru';try{localStorage.setItem('flor.lang',lang);}catch(x){}buildStatic();render();return;}
+  if(e.target.closest('#careBtn')){state.tab='care';state.careTab='sheet';render();window.scrollTo({top:0,behavior:'smooth'});return;}
+  if(e.target.closest('#dlCareBtn')){downloadCare();return;}
+  if(e.target.closest('#printCareBtn')){printCare();return;}
+  if(e.target.closest('#saveBtn')){$('#saveName').value='';openModal('saveModal');return;}
+  if(e.target.closest('#saveConfirm')){store.save($('#saveName').value.trim()||t('saved.name_placeholder'));closeAll();toast(t('toast.saved'));render();return;}
   if(e.target.closest('#shareBtn')){const q=encodeState().toString();await copyText(location.origin+location.pathname+'?'+q);history.replaceState(null,'','?'+q);toast(t('toast.link_copied'));return;}
-  if(e.target.closest('#aiBtn')){openAI();return;}
-  if(e.target.closest('#aiClose')){hide('aiModal');return;}
+  if(e.target.closest('#aiBtn')){$('#aiPrompt').value=aiPrompt();$('#aiTargets').innerHTML='<button class="ai-target" data-ai="google">'+t('ai.target_google')+'</button><button class="ai-target" data-ai="perplexity">'+t('ai.target_perplexity')+'</button>';openModal('aiModal');return;}
   if(e.target.closest('#aiCopy')){await copyText($('#aiPrompt').value);toast(t('toast.ai_copied'));return;}
   const at=e.target.closest('[data-ai]');if(at){const s=$('#aiPrompt').value;await copyText(s);window.open(at.dataset.ai==='google'?'https://www.google.com/search?udm=50&q='+encodeURIComponent(s):'https://www.perplexity.ai/?q='+encodeURIComponent(s),'_blank','noopener');toast(t('toast.ai_copied'));return;}
-  if(e.target.closest('#drawerClose')||e.target.id==='drawerScrim'){hide('drawer');return;}
-  if(e.target.id==='saveScrim'){hide('saveModal');return;}
-  if(e.target.id==='aiScrim'){hide('aiModal');return;}
   const dg=e.target.closest('[data-diag]');if(dg){dg.closest('.diag-item').classList.toggle('open');return;}
-  const ld=e.target.closest('[data-load]');if(ld){store.load(ld.dataset.load);setView('builder');return;}
-  const dl=e.target.closest('[data-del]');if(dl){store.del(dl.dataset.del);renderSaved();toast(t('toast.deleted'));return;}
-  if(e.target.closest('#exportBtn')){const blob=new Blob([JSON.stringify(store.all(),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='florarium-builds.json';a.click();URL.revokeObjectURL(a.href);return;}
+  const ld=e.target.closest('[data-load]');if(ld){store.load(ld.dataset.load);return;}
+  const dl=e.target.closest('[data-del]');if(dl){const id=+dl.dataset.del,b=store.all().find(x=>x.id===id);store.del(id);render();toast(t('toast.deleted'),()=>{if(b){const a=store.all();a.push(b);localStorage.setItem('florarium.builds.v1',JSON.stringify(a));render();}});return;}
+  if(e.target.closest('#exportBtn')){const b=new Blob([JSON.stringify(store.all(),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='florarium-builds.json';a.click();URL.revokeObjectURL(a.href);return;}
+  if(e.target.closest('[data-close]')){closeAll();return;}
+  if(e.target.closest('#sheetClose')||e.target.id==='scrim'){closeAll();return;}
 });
-document.addEventListener('input',e=>{if(e.target.id==='searchInput'){state.filters.q=e.target.value;renderCatalog();return;}if(e.target.id==='volRange'){const target=+e.target.value;state.vessel.height=Math.max(8,Math.round(state.vessel.height*(target/(D.volume||1))));state.vessel.preset='custom';renderConfig();update();return;}if(e.target.id==='hRange'){state.vessel.height=+e.target.value;state.vessel.preset='custom';syncRanges();update();return;}});
-document.addEventListener('change',e=>{const id=e.target.id;
-  if(id==='vesselSelect'){const p=DB.vessels.presets.find(x=>x.id===e.target.value);if(p)applyVesselPreset(p);renderConfig();update();return;}
-  if(id==='onlyCompat'){state.filters.onlyCompatible=e.target.checked;saveFilters();renderCatalog();return;}
-  if(id==='placeSelect'){state.placement=e.target.value;update();return;}
-  if(id==='waterSelect'){state.water=e.target.value;update();return;}
-  if(id==='styleSelect'){state.style=e.target.value;state.filters.group='all';update();return;}
-  if(id==='sortSelect'){state.filters.sort=e.target.value;renderCatalog();return;}
-  if(id==='stoneSelect'&&e.target.value){if(!state.stones.includes(e.target.value))state.stones.push(e.target.value);renderConfig();update();return;}
-  if(id==='decorSelect'&&e.target.value){if(!state.decor.includes(e.target.value))state.decor.push(e.target.value);renderConfig();update();return;}
-  if(e.target.dataset.flag){state.flags[e.target.dataset.flag]=e.target.checked;update();return;}
-  if(id==='importFile'){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const a=JSON.parse(r.result);if(Array.isArray(a)){localStorage.setItem('florarium.builds.v1',JSON.stringify(a));renderSaved();toast(t('toast.imported'));}}catch(x){toast(t('toast.import_error'));}};r.readAsText(f);return;}
+document.addEventListener('input',e=>{
+  const id=e.target.id;
+  if(id==='q-plants'||id==='q-fauna'){const k=id.slice(2);state.filters[k].q=e.target.value;renderGrid(k);return;}
+  if(id==='volRange'){const target=+e.target.value;state.vessel.height=Math.max(8,Math.round(state.vessel.height*(target/(D.volume||1))));state.vessel.preset='custom';render({skipSetup:true});return;}
+  if(id==='hRange'){state.vessel.height=+e.target.value;state.vessel.preset='custom';render({skipSetup:true});return;}
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape')['drawer','saveModal','aiModal'].forEach(hide);});
+document.addEventListener('change',e=>{
+  const id=e.target.id;
+  if(id==='vesselSelect'){const p=DB.vessels.presets.find(x=>x.id===e.target.value);if(p)applyVesselPreset(p);render();return;}
+  if(id==='placeSelect'){state.placement=e.target.value;render();return;}
+  if(id==='waterSelect'){state.water=e.target.value;render();return;}
+  if(id==='styleSelect'){state.style=e.target.value;state.filters.plants.group='all';state.filters.fauna.group='all';render();return;}
+  if(id==='subSelect'){state.substrate=e.target.value;render();return;}
+  if(id==='stoneSelect'&&e.target.value){if(!state.stones.includes(e.target.value))state.stones.push(e.target.value);render();return;}
+  if(id==='decorSelect'&&e.target.value){if(!state.decor.includes(e.target.value))state.decor.push(e.target.value);render();return;}
+  if(id==='sort-plants'||id==='sort-fauna'){const k=id.slice(5);state.filters[k].sort=e.target.value;renderGrid(k);return;}
+  if(id==='only-plants'||id==='only-fauna'){const k=id.slice(5);state.filters[k].only=e.target.checked;saveFilters();renderCatalog(k);return;}
+  if(e.target.dataset.flag){state.flags[e.target.dataset.flag]=e.target.checked;render();return;}
+  if(id==='importFile'){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const a=JSON.parse(r.result);if(Array.isArray(a)){localStorage.setItem('florarium.builds.v1',JSON.stringify(a));render();toast(t('toast.imported'));}}catch(x){toast(t('toast.import_error'));}};r.readAsText(f);return;}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();if(e.key==='Enter'){const t_=e.target.closest('[data-open]');if(t_){const o=DB.plants.concat(DB.fauna).find(x=>x.id===t_.dataset.open);if(o)openSheet(o);}}});
 document.addEventListener('dragstart',e=>{const r=e.target.closest('.sel-row');if(r){dragIdx=+r.dataset.idx;r.classList.add('dragging');}});
 document.addEventListener('dragend',e=>{const r=e.target.closest('.sel-row');if(r)r.classList.remove('dragging');});
 document.addEventListener('dragover',e=>{if(e.target.closest('.sel-row'))e.preventDefault();});
-document.addEventListener('drop',e=>{const r=e.target.closest('.sel-row');if(r&&dragIdx!=null){const to=+r.dataset.idx,it=state.items.splice(dragIdx,1)[0];state.items.splice(to,0,it);dragIdx=null;update();}});
-document.addEventListener('click',e=>{
-  const jt=e.target.closest('[data-jartab]');
-  if(jt){state.jarTab=jt.dataset.jartab;$$('#jarPanel [data-jartab]').forEach(b=>{const on=b.dataset.jartab===state.jarTab;b.classList.toggle('on',on);b.setAttribute('aria-selected',on);});$$('#jarPanel [data-jarbody]').forEach(d=>d.classList.toggle('on',d.dataset.jarbody===state.jarTab));return;}
-  if(e.target.closest('#dlCareBtn')||e.target.closest('#dlCareBtn2')){downloadCareGuide();return;}
-  if(e.target.closest('#printCareBtn')){printCare();return;}
-  if(e.target.closest('#resetFiltersBtn')){resetFilters();return;}
-  if(e.target.closest('#showHiddenBtn')){state.filters.onlyCompatible=false;saveFilters();renderCatalog();return;}
-});
+document.addEventListener('drop',e=>{const r=e.target.closest('.sel-row');if(r&&dragIdx!=null){const to=+r.dataset.idx,it=state.items.splice(dragIdx,1)[0];state.items.splice(to,0,it);dragIdx=null;render();}});
 window.__fc={get state(){return state;},get D(){return D;},get DB(){return DB;},t:t};
 boot();
