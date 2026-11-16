@@ -3,7 +3,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const DATA=['criteria','styles','materials','plants_fauna','norms','vessels','care_templates','diagnostics'];
 const NS=['ui','rules','care','diag','catalog'];
 const DB={},I18N={ru:{},en:{}};
-let lang='ru',D=null,PRESETS=[],dragIdx=null,prevBlocks=0,booted=false;
+let lang='ru',D=null,PRESETS=[],dragIdx=null,booted=false;
 const TABS=['build','plants','fauna','setup','care'];
 const state={tab:'build',buildTab:'composition',careTab:'sheet',
   vessel:{preset:'vessel_jar_3l',shape:'jar',diameter:14,height:20,width:20,depth:20,neck:null,closure:'sealable',volumeLabel:null},
@@ -11,6 +11,12 @@ const state={tab:'build',buildTab:'composition',careTab:'sheet',
   flags:{grow:false,winter:false,water:false},items:[],stones:[],decor:[],substrate:null,
   filters:{plants:{group:'all',q:'',sort:'name',only:true},fauna:{group:'all',q:'',sort:'name',only:true}}};
 const FL={air_humidity:{ru:'Влажность воздуха',en:'Air humidity'},soil_humidity:{ru:'Влажность грунта',en:'Soil moisture'},substrate:{ru:'Субстрат',en:'Substrate'},light:{ru:'Свет',en:'Light'},temperature:{ru:'Температура',en:'Temperature'}};
+const SUPP={
+  ru:{norms:{seasonal:{summer_shading:'Летом притеняйте банку от прямого солнца и проветривайте от перегрева',wintering_months_default:'Ноябрь — февраль',winter_photoperiod_boost_hours:'Зимой добавьте 2 часа досветки'},layers:{drainage:'Дренаж',separator:'Разделитель',charcoal:'Уголь',substrate:'Субстрат'},water:'Нормы полива',placement_map:'Свет по месту установки',light_norms:'Нормы освещения',condensation:'Норма конденсата',ventilation:'График проветривания',fauna_defaults:{nematode_dosing:'Нематоды вносятся по инструкции производителя'},maintenance:'Обслуживание'},
+    why:{basis:'Основание',rule:'Проверка совместимости',norm:'Норма ухода',species:'Карточка вида',material:'Свойства материала',practice:'Практика ухода',diag:'Диагностика',calc:'Расчёт по вашей ёмкости'}},
+  en:{norms:{seasonal:{summer_shading:'In summer shade the jar from direct sun and ventilate against overheating',wintering_months_default:'November — February',winter_photoperiod_boost_hours:'Add 2 hours of supplemental light in winter'},layers:{drainage:'Drainage',separator:'Separator',charcoal:'Charcoal',substrate:'Substrate'},water:'Watering standards',placement_map:'Light by placement',light_norms:'Lighting standards',condensation:'Condensation norm',ventilation:'Airing schedule',fauna_defaults:{nematode_dosing:'Apply nematodes per the manufacturer’s instructions'},maintenance:'Maintenance'},
+    why:{basis:'Basis',rule:'Compatibility check',norm:'Care standard',species:'Species card',material:'Material properties',practice:'Care practice',diag:'Diagnostics',calc:'Computed from your vessel'}}
+};
 const ICON={
   build:'<svg viewBox="0 0 24 24" class="ic"><path d="M8 3h8M9 3v3.2C9 8 6 9.6 6 13v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6c0-3.4-3-5-3-6.8V3"/><path d="M6.5 16h11"/></svg>',
   plants:'<svg viewBox="0 0 24 24" class="ic"><path d="M12 21c5-3 8-7 8-12-5 0-9 3-12 8"/><path d="M12 21C7 18 4 14 4 9c5 0 9 3 12 8"/></svg>',
@@ -25,12 +31,66 @@ const ICON={
   dice:'<svg viewBox="0 0 24 24" class="ic"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8.5" cy="8.5" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="15.5" cy="15.5" r="1.1"/></svg>',
   leaf:'<svg viewBox="0 0 24 24"><path d="M12 21c5-3 8-7 8-12-5 0-9 3-12 8"/><path d="M12 21C7 18 4 14 4 9c5 0 9 3 12 8"/></svg>'
 };
-const L=(k,ru,en)=>{const s=t(k);return s===k?(lang==='ru'?ru:en):s;};
+const L=(k,ru,en)=>{const s=raw(k);return s==null?(lang==='ru'?ru:en):String(s);};
 try{lang=localStorage.getItem('flor.lang')||'ru';const f=JSON.parse(localStorage.getItem('flor.filters')||'null');if(f){if(typeof f.plants==='boolean')state.filters.plants.only=f.plants;if(typeof f.fauna==='boolean')state.filters.fauna.only=f.fauna;}}catch(e){}
 const saveFilters=()=>{try{localStorage.setItem('flor.filters',JSON.stringify({plants:state.filters.plants.only,fauna:state.filters.fauna.only}));}catch(e){}};
 
 window.__ph=()=>'<div class="ph">'+ICON.leaf+'</div>';
 window.__imgErr=function(img){const fb=img.getAttribute('data-fb');if(fb){img.setAttribute('data-fb','');img.src=fb;}else img.outerHTML=window.__ph();};
+
+/* ── i18n: словарь → данные → человекочитаемая подпись. Сырые ключи на экран не попадают ── */
+const KEY_RE=/^[a-z][a-z0-9_]*(\.[a-z0-9_[\]=]+)+$/i;
+const dig=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
+function dataLookup(path){
+  if(!booted)return null;
+  const root=path.split('.')[0];
+  if(root==='norms')return dig(DB.norms,path.slice(6));
+  if(root==='materials')return dig(DB.materials,path.slice(10));
+  if(root==='vessels')return dig(DB.vessels,path.slice(8));
+  return null;
+}
+function humanize(path){
+  const seg=String(path).split('.').filter(Boolean).pop()||'';
+  const words=seg.replace(/\[.*?\]/g,'').replace(/[_-]+/g,' ').trim();
+  if(!words)return lang==='ru'?'Параметр':'Parameter';
+  return words.charAt(0).toUpperCase()+words.slice(1);
+}
+function raw(path){
+  let s=dig(I18N[lang],path);
+  if(s==null)s=dig(I18N.en,path);
+  if(s==null)s=dig(SUPP[lang],path);
+  if(s==null)s=dig(SUPP.en,path);
+  if(s==null){const d=dataLookup(path);if(typeof d==='string'||typeof d==='number')s=d;}
+  return s==null?null:s;
+}
+function t(path,vars){
+  vars=vars||{};
+  const s=raw(path);
+  const out=s==null?humanize(path):String(s);
+  return out.replace(/\{(\w+)\}/g,(_,k)=>vars[k]!=null?vars[k]:'');
+}
+function sourceLabel(src){
+  const s=String(src||'');
+  const w=k=>dig(SUPP[lang],'why.'+k)||dig(SUPP.en,'why.'+k);
+  let kind='practice';
+  if(/^r_/.test(s))kind='rule';
+  else if(/^norms\b/.test(s))kind='norm';
+  else if(/^plants_fauna\b/.test(s))kind='species';
+  else if(/^materials\b/.test(s))kind='material';
+  else if(/^diagnostics\b/.test(s))kind='diag';
+  else if(/×|derived|footprint/.test(s))kind='calc';
+  return w('basis')+': '+w(kind);
+}
+function sweepKeys(root){
+  if(!root)return;
+  const walk=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
+    const p=n.parentElement;if(!p)return NodeFilter.FILTER_REJECT;
+    if(/^(SCRIPT|STYLE|TEXTAREA|INPUT|OPTION)$/.test(p.tagName))return NodeFilter.FILTER_REJECT;
+    return KEY_RE.test(n.nodeValue.trim())?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
+  }});
+  const list=[];while(walk.nextNode())list.push(walk.currentNode);
+  list.forEach(n=>{const key=n.nodeValue.trim();const s=raw(key);n.nodeValue=s!=null?String(s):humanize(key);});
+}
 
 async function j(u){const c=new AbortController(),to=setTimeout(()=>c.abort(),15000);try{const r=await fetch(u,{cache:'no-store',signal:c.signal});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}finally{clearTimeout(to);}}
 async function boot(){
@@ -46,10 +106,9 @@ async function boot(){
     buildStatic();render();window.__florReady=true;
   }catch(e){console.error(e);window.__florFail('Не удалось загрузить данные: '+e.message+'. Проверьте файлы в /data и /i18n и обновите страницу (Ctrl+F5).');}
 }
-function t(path,vars){vars=vars||{};let s=path.split('.').reduce((o,k)=>o&&o[k],I18N[lang]);if(s==null)s=path.split('.').reduce((o,k)=>o&&o[k],I18N.en);if(s==null)s=path;return String(s).replace(/\{(\w+)\}/g,(_,k)=>vars[k]!=null?vars[k]:'{'+k+'}');}
-const nm=o=>!o?'':(lang==='ru'?o.name_ru:o.name_en)||o.name_latin||'';
+const nm=o=>!o?'':(lang==='ru'?o.name_ru:o.name_en)||o.name_latin||o.name_ru||'';
 const fmt=n=>Number(n||0).toLocaleString(lang==='ru'?'ru-RU':'en-US',{maximumFractionDigits:1});
-const enumT=(e,v)=>t('enum.'+e+'.'+v);
+const enumT=(e,v)=>v==null?'—':t('enum.'+e+'.'+v);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function applyTheme(v){document.documentElement.setAttribute('data-theme',v);const b=$('#themeBtn');if(b){b.innerHTML=v==='dark'?ICON.sun:ICON.moon;b.title=v==='dark'?L('theme.light','Светлая тема','Light theme'):L('theme.dark','Тёмная тема','Dark theme');}}
 
@@ -70,7 +129,7 @@ function restoreURL(){
 const store={all:()=>{try{return JSON.parse(localStorage.getItem('florarium.builds.v1')||'[]');}catch(e){return[];}},
   save(n){const a=store.all();a.unshift({id:Date.now(),name:n,created:new Date().toISOString(),state:JSON.parse(JSON.stringify(state))});localStorage.setItem('florarium.builds.v1',JSON.stringify(a));},
   del(id){localStorage.setItem('florarium.builds.v1',JSON.stringify(store.all().filter(x=>x.id!==id)));},
-  load(id){const b=store.all().find(x=>x.id===id);if(!b)return;const s=JSON.parse(JSON.stringify(b.state));delete s.tab;delete s.buildTab;delete s.careTab;Object.assign(state,s);if(!state.filters.plants)state.filters={plants:{group:'all',q:'',sort:'name',only:true},fauna:{group:'all',q:'',sort:'name',only:true}};state.tab='build';state.buildTab='composition';render();toast(t('toast.saved'));}};
+  load(id){const b=store.all().find(x=>x.id===id);if(!b)return;const s=JSON.parse(JSON.stringify(b.state));delete s.tab;delete s.buildTab;delete s.careTab;Object.assign(state,s);if(!state.filters||!state.filters.plants)state.filters={plants:{group:'all',q:'',sort:'name',only:true},fauna:{group:'all',q:'',sort:'name',only:true}};state.tab='build';state.buildTab='composition';render();toast(t('toast.saved'));}};
 
 function obj(i){return (i.kind==='plant'?DB.plants:DB.fauna).find(x=>x.id===i.id);}
 const selP=()=>state.items.filter(i=>i.kind==='plant').map(obj).filter(Boolean);
@@ -81,7 +140,7 @@ const inter=a=>a.length?a.reduce((x,y)=>x.filter(v=>y.indexOf(v)>=0),a[0].slice(
 function habit(p){const l=p.layer_form||[];if(l.length===1&&l[0]==='mount')return 'mount';if(l.some(x=>x==='bush'||x==='accent'))return 'upright';if(l.indexOf('vine')>=0)return 'trailing';return 'groundcover';}
 function currentSub(){if(state.substrate)return state.substrate;const c=inter(selP().concat(selF()).map(x=>x.substrate));return c[0]||'tropical';}
 const subObj=()=>DB.materials.substrates.find(s=>s.id===currentSub());
-const compName=id=>{const c=DB.materials.components.find(x=>x.id===id);return c?nm(c):id;};
+const compName=id=>{const c=(DB.materials.components||[]).find(x=>x.id===id);return c?nm(c):humanize(id);};
 function applyVesselPreset(p){const d=p.dims_cm||{},v=state.vessel;v.preset=p.id;v.shape=p.shape;v.closure=p.closure_default||v.closure;v.neck=p.neck_diameter_cm||null;v.volumeLabel=p.volume_liters_label||null;if(d.diameter_cm!=null)v.diameter=d.diameter_cm;if(d.height_cm!=null)v.height=d.height_cm;if(d.width_cm!=null)v.width=d.width_cm;if(d.depth_cm!=null)v.depth=d.depth_cm;if(!p.systems.includes(state.system))state.system=p.systems[0];}
 
 function derive(){
@@ -203,15 +262,17 @@ function render(opts){
   if(state.tab==='setup'&&opts.skipSetup)syncSetupValues();
   if(state.tab==='care')renderCare();
   renderRail(hits);
+  sweepKeys($('#shell'));
 }
 function renderStatus(hits){
   const el=$('#statusStrip'),bl=hits.filter(h=>h.sev==='block').length,wa=hits.filter(h=>h.sev==='warning').length;
   const lvl=bl?'block':wa?'warn':'ok';
   el.innerHTML='<span class="s-orb '+lvl+'"></span><span class="s-text">'+selP().length+' '+t('step.plants').toLowerCase()+' · '+selF().length+' '+t('step.fauna').toLowerCase()+' <i>· '+fmt(D.volume)+' '+t('units.l')+'</i></span>'+(bl?'<span class="badge">'+bl+'</span>':'')+ICON.chev;
+  sweepKeys(el);
 }
 function go(tab){if(!TABS.includes(tab))return;state.tab=tab;render();window.scrollTo({top:0,behavior:'smooth'});}
 
-/* ── build pane ── */
+/* ── build ── */
 function renderBuild(hits){
   const bl=hits.filter(h=>h.sev==='block'),wa=hits.filter(h=>h.sev==='warning'),inf=hits.filter(h=>h.sev==='info');
   const lvl=bl.length?'block':wa.length?'warn':'ok';
@@ -288,6 +349,7 @@ function renderGrid(kind){
   const note=hidden?'<div class="grid-note"><span>'+L('filter.hidden','Скрыто несовместимых: {n}','Hidden incompatible: {n}').replace('{n}',hidden)+'</span><button class="link-btn" data-showhidden="'+kind+'">'+t('btn.show_all')+'</button></div>':'';
   const empty=items.length?'':'<div class="empty"><div class="empty-orb"></div><h3>'+L('state.empty_catalog_title','Здесь пусто','Nothing here')+'</h3><p class="sub">'+L('state.empty_catalog_text','Сбросьте фильтры или выберите другую группу.','Reset the filters or pick another group.')+'</p><button class="btn ghost" data-reset="'+kind+'">'+L('btn.reset_filters','Сбросить фильтры','Reset filters')+'</button></div>';
   $('#'+kind+'Grid').innerHTML=cards+note+empty;
+  sweepKeys($('#'+kind+'Grid'));
 }
 
 /* ── setup ── */
@@ -317,6 +379,7 @@ function renderSetup(){
       row(L('setup.substrate','Субстрат','Substrate'),'<select class="select" style="width:100%" id="subSelect">'+DB.materials.substrates.map(s=>'<option value="'+s.id+'"'+(s.id===currentSub()?' selected':'')+'>'+nm(s)+'</option>').join('')+'</select>')+
       (subObj()?'<p class="sub">'+subObj().recipe.map(r=>Math.round(r.pct)+'% '+compName(r.component)).join(' · ')+'</p>':''));
   syncSetupValues();
+  sweepKeys($('#setupBody'));
 }
 function syncSetupValues(){
   const vr=$('#volRange'),hr=$('#hRange');if(!vr||!D)return;
@@ -330,8 +393,8 @@ function matchFilter(o,f){if(f.trim_interval_weeks_not_null)return o.trim_interv
 const lightKey=()=>D.corridors.light[0]||'bright_indirect';
 function careVars(tpl,item){
   const P=selP(),N=DB.norms,sub=subObj(),names=a=>a.map(nm).join(', '),lk=lightKey();
-  const v={stone_names:names(stones()),days:'3–5',components:sub?sub.recipe.map(r=>compName(r.component)).join(', '):'',lead_time_weeks:N.fauna_defaults.cleanup_crew_lead_time_weeks.join('–'),layer_order:DB.materials.meta.layer_order.join(' → '),dose_ml:N.water.closed_calibration_dose_ml_per_3l.join('–'),recheck_hours:N.water.closed_calibration_recheck_hours,placement_label:enumT('placement',state.placement),photoperiod_h:N.light_norms.photoperiod_hours[lk].join('–'),distance_cm:N.light_norms.led_distance_cm.join('–'),boost_h:N.light_norms.winter_boost_hours,interval_weeks:currentSub()==='succulent_mineral'?N.water.open_succulent_interval_weeks.join('–'):N.water.open_tropical_interval_weeks.join('–'),tray_cm:'1–2',normal:t('norms.condensation.normal'),over_sign:t('norms.condensation.over_sign'),over_action:t('norms.condensation.over_action'),under_sign:t('norms.condensation.under_sign'),under_action:t('norms.condensation.under_action'),schedule:state.system==='closed'?t('norms.ventilation.closed_schedule'):t('norms.ventilation.semi_schedule'),months:N.seasonal.wintering_months_default.join(', '),temp_c:'10–15',refresh_weeks:N.maintenance.litter_refresh_interval_weeks.join('–'),drainage_l:fmt(D.footprint*D.drainage/1000),substrate_l:fmt(D.footprint*D.depth/1000),charcoal_ml:Math.round(D.volume*15),substrate_name:sub?nm(sub):'',ppfd_range:N.light_norms.ppfd_umol_m2_s[lk].join('–'),species:names(P)};
-  if(item){v.name=nm(item);v.species=nm(item);v.interval_weeks=item.trim_interval_weeks;v.mechanism=enumT('spread_mechanism',item.spread_mechanism||'none');v.interval_days=item.feeding_plan?item.feeding_plan.interval_days:7;v.items=item.feeding_plan?item.feeding_plan.items.join(', '):'';v.count_min=item.starter_count?item.starter_count.min:'';v.count_recommended=item.starter_count?item.starter_count.recommended:'';}
+  const v={stone_names:names(stones()),days:'3–5',components:sub?sub.recipe.map(r=>compName(r.component)).join(', '):'',lead_time_weeks:N.fauna_defaults.cleanup_crew_lead_time_weeks.join('–'),layer_order:(DB.materials.meta.layer_order||[]).map(x=>t('bom.'+x)).join(' → '),dose_ml:N.water.closed_calibration_dose_ml_per_3l.join('–'),recheck_hours:N.water.closed_calibration_recheck_hours,placement_label:enumT('placement',state.placement),photoperiod_h:N.light_norms.photoperiod_hours[lk].join('–'),distance_cm:N.light_norms.led_distance_cm.join('–'),boost_h:N.light_norms.winter_boost_hours,interval_weeks:currentSub()==='succulent_mineral'?N.water.open_succulent_interval_weeks.join('–'):N.water.open_tropical_interval_weeks.join('–'),tray_cm:'1–2',normal:t('norms.condensation.normal'),over_sign:t('norms.condensation.over_sign'),over_action:t('norms.condensation.over_action'),under_sign:t('norms.condensation.under_sign'),under_action:t('norms.condensation.under_action'),schedule:state.system==='closed'?t('norms.ventilation.closed_schedule'):t('norms.ventilation.semi_schedule'),months:t('norms.seasonal.wintering_months_default'),temp_c:'10–15',refresh_weeks:N.maintenance.litter_refresh_interval_weeks.join('–'),drainage_l:fmt(D.footprint*D.drainage/1000),substrate_l:fmt(D.footprint*D.depth/1000),charcoal_ml:Math.round(D.volume*15),substrate_name:sub?nm(sub):'',ppfd_range:N.light_norms.ppfd_umol_m2_s[lk].join('–'),species:names(P)};
+  if(item){v.name=nm(item);v.species=nm(item);v.interval_weeks=item.trim_interval_weeks;v.mechanism=enumT('spread_mechanism',item.spread_mechanism||'none');v.interval_days=item.feeding_plan?item.feeding_plan.interval_days:7;v.items=item.feeding_plan?item.feeding_plan.items.map(x=>humanize(x)).join(', '):'';v.count_min=item.starter_count?item.starter_count.min:'';v.count_recommended=item.starter_count?item.starter_count.recommended:'';}
   return v;
 }
 function cond(c){
@@ -362,12 +425,13 @@ function renderCare(){
   if(state.careTab==='diag'){
     body.innerHTML=DB.diagnostics.symptoms.map(s=>{const cs=s.causes.map(c=>Object.assign({},c,{score:c.base_weight+c.boosts.reduce((a,b)=>a+(cond(b.when)?b.add:0),0)})).sort((a,b)=>b.score-a.score).slice(0,3);
       return '<div class="diag-item"><button class="diag-q" data-diag="'+s.id+'"><span>'+t('diag.'+s.id+'.name')+'</span>'+ICON.chev+'</button><div class="diag-a">'+cs.map(c=>'<div class="cause"><div class="cause-title">'+t(c.cause_key)+'</div><div class="cause-fix">'+t(c.fix_key)+'</div><div class="cause-prev">'+t(c.prevention_key)+'</div></div>').join('')+'</div></div>';}).join('');
-    return;
+    sweepKeys(body);return;
   }
   const blocks=careBlocks();
   const toolbar='<div class="care-toolbar"><button class="btn primary" id="dlCareBtn">'+L('btn.download_care','Скачать памятку','Download care guide')+'</button><button class="btn ghost" id="printCareBtn">'+L('btn.print','Печать / PDF','Print / PDF')+'</button></div>';
-  const cards=DB.care_templates.sections.map(sec=>{const bs=blocks.filter(b=>b.tpl.section===sec.id);return bs.length?'<div class="care-card"><h3>'+t('care.section.'+sec.id)+'</h3>'+bs.map(b=>'<div class="care-item">'+t(b.tpl.text_key,b.vars)+'<span class="why">'+b.tpl.source+'</span></div>').join('')+'</div>':'';}).join('');
+  const cards=DB.care_templates.sections.map(sec=>{const bs=blocks.filter(b=>b.tpl.section===sec.id);return bs.length?'<div class="care-card"><h3>'+t('care.section.'+sec.id)+'</h3>'+bs.map(b=>'<div class="care-item">'+t(b.tpl.text_key,b.vars)+'<span class="why">'+esc(sourceLabel(b.tpl.source))+'</span></div>').join('')+'</div>':'';}).join('');
   body.innerHTML='<div class="care-grid">'+toolbar+(cards||'<div class="empty"><div class="empty-orb"></div><h3>'+L('state.empty_care_title','Памятка пуста','No care notes')+'</h3><p class="sub">'+L('state.empty_care_text','Добавьте растения — советы появятся автоматически.','Add plants and the tips will appear.')+'</p><button class="btn ghost" data-go="plants">'+t('state.empty_action')+'</button></div>')+'</div>';
+  sweepKeys(body);
 }
 function careText(){
   const P=selP(),F=selF(),preset=DB.vessels.presets.find(v=>v.id===state.vessel.preset),sub=subObj(),out=[];
@@ -392,21 +456,24 @@ function renderRail(hits){
   const bl=hits.filter(h=>h.sev==='block').length,wa=hits.filter(h=>h.sev==='warning').length;
   const lvl=bl?'block':wa?'warn':'ok';
   const title=bl?t('compat.blocks_title'):wa?t('compat.warnings_title'):t('compat.all_good');
+  const first=hits.find(h=>h.sev===(bl?'block':'warning'));
   rail.innerHTML='<div class="rail-head"><span class="rail-orb '+lvl+'"></span><span><span class="rail-title">'+title+'</span><span class="rail-note">'+fmt(D.volume)+' '+t('units.l')+' · '+selP().length+'+'+selF().length+'</span></span></div>'+
     '<div class="rail-list">'+(state.items.map((it,i)=>{const o=obj(it);return o?'<div class="rail-row">'+imgHTML(o)+'<span>'+nm(o)+'</span><button class="sel-x" data-rm="'+i+'" aria-label="'+t('btn.remove')+'">'+ICON.x+'</button></div>':'';}).join('')||'<p class="sub">'+t('state.empty_body')+'</p>')+'</div>'+
-    (bl||wa?'<div class="issue '+(bl?'block':'warning')+'"><div class="issue-head">'+(bl?bl+' '+t('severity.block').toLowerCase():wa+' '+t('severity.warning').toLowerCase())+'</div><div class="issue-remedy">'+t('rules.'+(hits.find(h=>h.sev===(bl?'block':'warning'))||hits[0]).id+'.msg',(hits.find(h=>h.sev===(bl?'block':'warning'))||hits[0]).vars)+'</div></div>':'')+
+    (first?'<div class="issue '+(bl?'block':'warning')+'"><div class="issue-head">'+(bl?bl+' '+t('severity.block').toLowerCase():wa+' '+t('severity.warning').toLowerCase())+'</div><div class="issue-remedy">'+t('rules.'+first.id+'.msg',first.vars)+'</div></div>':'')+
     '<div class="rail-actions"><button class="btn primary wide" data-go="build">'+L('rail.open','Открыть сборку','Open build')+'</button><button class="btn ghost" id="saveBtn">'+t('btn.save')+'</button><button class="btn ghost" id="shareBtn">'+t('btn.copy_link')+'</button></div>';
+  sweepKeys(rail);
 }
 
 /* ── sheet / modal / toast ── */
 function openSheet(o){
-  const im=o.image||{},note=t('notes.'+o.id),kv=(l,v)=>v?'<dt>'+l+'</dt><dd>'+v+'</dd>':'';
-  $('#sheetBody').innerHTML=imgHTML(o,'sheet-photo')+'<h2 id="sheetTitle">'+nm(o)+'</h2><div class="latin">'+o.name_latin+'</div><div class="tags"><span class="tag care">'+t('group.'+o.group)+'</span>'+(o.size?'<span class="tag size">'+enumT('size',o.size)+'</span>':'')+(o.care_level?'<span class="tag light">'+enumT('care_level',o.care_level)+'</span>':'')+'</div>'+(note!=='notes.'+o.id?'<div class="sheet-note">'+note+'</div>':'')+
+  const im=o.image||{},note=raw('notes.'+o.id),kv=(l,v)=>v?'<dt>'+l+'</dt><dd>'+v+'</dd>':'';
+  $('#sheetBody').innerHTML=imgHTML(o,'sheet-photo')+'<h2 id="sheetTitle">'+nm(o)+'</h2><div class="latin">'+o.name_latin+'</div><div class="tags"><span class="tag care">'+t('group.'+o.group)+'</span>'+(o.size?'<span class="tag size">'+enumT('size',o.size)+'</span>':'')+(o.care_level?'<span class="tag light">'+enumT('care_level',o.care_level)+'</span>':'')+'</div>'+(note?'<div class="sheet-note">'+note+'</div>':'')+
     '<dl class="kv">'+kv(t('input.system'),(o.system_type||[]).map(x=>enumT('system_type',x)).join(', '))+kv(FL.light[lang],(o.light||[]).map(x=>enumT('light',x)).join(', '))+kv(FL.air_humidity[lang],(o.air_humidity||[]).map(x=>enumT('air_humidity',x)).join(', '))+kv(FL.soil_humidity[lang],(o.soil_humidity||[]).map(x=>enumT('soil_humidity',x)).join(', '))+kv(FL.temperature[lang],(o.temperature||[]).map(x=>enumT('temperature',x)).join(', '))+(o.role?kv(t('step.fauna'),o.role.map(x=>enumT('fauna_role',x)).join(', ')):'')+'</dl>'+
     '<div class="sheet-links"><a class="btn ghost" target="_blank" rel="noopener" href="https://www.google.com/search?tbm=isch&q='+encodeURIComponent(o.name_latin)+'">'+t('caption.search_google')+'</a><a class="btn ghost" target="_blank" rel="noopener" href="https://yandex.ru/images/search?text='+encodeURIComponent(o.name_latin)+'">'+t('caption.search_yandex')+'</a></div>'+
     '<div class="credit">'+(im.attribution||(im.author?t('caption.credit',{author:im.author,license:im.license})+' · <a href="'+im.source_url+'" target="_blank" rel="noopener">'+t('caption.source')+'</a>':t('caption.illustration')))+'</div>'+
     '<button class="btn primary" style="width:100%;margin-top:16px" data-add="'+o.id+'">'+(state.items.some(i=>i.id===o.id)?t('btn.remove'):t('btn.add'))+'</button>';
   $('#sheet').classList.remove('hidden');$('#scrim').classList.remove('hidden');
+  sweepKeys($('#sheetBody'));
 }
 function closeAll(){['sheet','saveModal','aiModal'].forEach(id=>$('#'+id).classList.add('hidden'));$('#scrim').classList.add('hidden');}
 function openModal(id){$('#'+id).classList.remove('hidden');$('#scrim').classList.remove('hidden');}
