@@ -1,6 +1,6 @@
 /*!
- * Florarium Combinator — SVG Preview Module (drop-in)
- * Требует: window.__fc с геттерами state/D/DB/t (см. app.js, конец файла).
+ * Florarium Combinator — SVG Preview Module
+ * Требует: window.__fc с геттерами state/D/DB/t (конец app.js).
  */
 (function () {
   'use strict'
@@ -18,7 +18,6 @@
   const PV_W = 240, PV_H = 320, PV_MARGIN = 20
   const sizePx = s => s === 'micro' ? 8 : s === 'large' ? 32 : 20
 
-  // 1-в-1 как в app.js
   const habitOf = p => {
     const l = p.layer_form || []
     if (l.length === 1 && l[0] === 'mount') return 'mount'
@@ -57,7 +56,6 @@
     }
   }
 
-  // ищет в DB.plants, DB.fauna и во всех DB.materials.*
   const findItem = (DB, id) => {
     if (!DB || !id) return null
     if (Array.isArray(DB.plants)) { const h = DB.plants.find(o => o && o.id === id); if (h) return h }
@@ -73,9 +71,10 @@
 
   const render = (state, D, DB) => {
     const v   = state.vessel || {}
-    const hCm = +v.height || 20
-    const wCm = +v.width || +v.diameter || +v.depth || 10
     const shape = v.shape || 'jar'
+    const hCm = +v.height || 20
+    const wide = ['cube','tank','geo_house'].includes(shape)
+    const wCm = wide ? (+v.width || 20) : (+v.diameter || +v.width || 14)
 
     const plants = (state.items || []).filter(i => i.kind === 'plant')
       .map(i => findItem(DB, i.id)).filter(Boolean)
@@ -93,11 +92,10 @@
     const bottomY = vY + vH
 
     const drainageCm = (D && D.drainage) || 1
-    const charcoalCm = (DB.norms && DB.norms.layers &&
-      (DB.norms.layers.charcoal_cm ||
-       (DB.norms.layers.charcoal && DB.norms.layers.charcoal.default))) || 0.5
-    const sepCm = 0.2
-    const subCm = Math.max(0.3, ((D && D.depth) || 3) - drainageCm - charcoalCm - sepCm)
+    const ch = DB.norms && DB.norms.layers && DB.norms.layers.charcoal
+    const charcoalCm = (ch && Array.isArray(ch.thickness_cm) ? ch.thickness_cm[0] : 0.5)
+    const sepCm = 0.3
+    const subCm = Math.max(0.5, (D && D.depth) || 3)
     const topCm = 0.3
 
     const drainY = bottomY - drainageCm * scale
@@ -179,7 +177,6 @@
     return s
   }
 
-  // ── host management ──
   const findPanel = () =>
     document.getElementById('jarPanel') ||
     document.querySelector('.jar, .jar-panel, [data-panel="jar"]')
@@ -198,10 +195,11 @@
   const sig = (state, D) => {
     try {
       return JSON.stringify({
-        v: [state.vessel.shape, state.vessel.height, state.vessel.width, state.vessel.diameter],
+        v: [state.vessel.shape, state.vessel.height, state.vessel.width, state.vessel.diameter, state.vessel.depth],
         i: (state.items || []).map(x => x.kind + ':' + x.id),
         s: state.stones,
         f: D && D.freeHeight,
+        d: D && D.depth,
         l: document.documentElement.lang
       })
     } catch { return '' }
