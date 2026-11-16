@@ -98,7 +98,7 @@
     {
       "id": "preset_air_minimal", "slug": "air-minimal",
       "name_ru": "Воздушный минимализм", "name_en": "Air minimal",
-      "desc_ru": "Одна тилландсия на коряге в几何 домике. Без грунта: замачивание раз в 1–2 недели.",
+      "desc_ru": "Одна тилландсия на коряге в геометрическом домике. Без грунта: замачивание раз в 1–2 недели.",
       "desc_en": "A single tillandsia on driftwood in a geometric house. No substrate: soak every 1–2 weeks.",
       "vessel": "vessel_geo_house_7l", "system": "open", "placement": "east_west", "water": "soft", "experience": "beginner", "style": "minimal_modern",
       "flags": { "grow": false, "winter": false, "water": false },
