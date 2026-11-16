@@ -26,9 +26,25 @@
   </div>
 </header>
 
+<div class="dock" id="dock" role="group" aria-label="Живые настройки"></div>
+
 <main class="shell" id="shell">
   <div class="workspace">
-    <section class="boot" id="boot"><span class="boot-orb"></span><p data-i18n="state.loading">Загружаем каталог…</p></section>
+    <section class="boot" id="boot">
+      <div class="skel-wrap">
+        <div class="skel-col"><div class="skel sk-h"></div><div class="skel sk-l"></div><div class="skel sk-l w70"></div><div class="skel sk-box"></div><div class="skel sk-l"></div><div class="skel sk-box"></div></div>
+        <div class="skel-grid">
+          <div class="skel-card"><div class="skel sk-p"></div><div class="skel-b"><div class="skel sk-l w70"></div><div class="skel sk-l w45"></div><div class="skel sk-btn"></div></div></div>
+          <div class="skel-card"><div class="skel sk-p"></div><div class="skel-b"><div class="skel sk-l w70"></div><div class="skel sk-l w45"></div><div class="skel sk-btn"></div></div></div>
+          <div class="skel-card"><div class="skel sk-p"></div><div class="skel-b"><div class="skel sk-l w70"></div><div class="skel sk-l w45"></div><div class="skel sk-btn"></div></div></div>
+          <div class="skel-card"><div class="skel sk-p"></div><div class="skel-b"><div class="skel sk-l w70"></div><div class="skel sk-l w45"></div><div class="skel sk-btn"></div></div></div>
+          <div class="skel-card"><div class="skel sk-p"></div><div class="skel-b"><div class="skel sk-l w70"></div><div class="skel sk-l w45"></div><div class="skel sk-btn"></div></div></div>
+          <div class="skel-card"><div class="skel sk-p"></div><div class="skel-b"><div class="skel sk-l w70"></div><div class="skel sk-l w45"></div><div class="skel sk-btn"></div></div></div>
+        </div>
+        <div class="skel-col"><div class="skel sk-box tall"></div><div class="skel sk-l"></div><div class="skel sk-l w70"></div><div class="skel sk-box"></div></div>
+      </div>
+      <p class="sub" data-i18n="state.loading">Загружаем каталог…</p>
+    </section>
     <section class="boot hidden" id="bootError"><span class="err-dot"></span><h2>Не удалось запустить</h2><p id="bootErrorMsg"></p><button class="btn primary" id="retryBtn" type="button">Повторить</button></section>
 
     <section class="pane hidden" id="pane-build">
@@ -66,9 +82,11 @@
     </section>
   </div>
 
-  <aside class="rail" id="rail" aria-label="Сборка">
+  <aside class="rail" id="rail" aria-label="Сборка и настройки">
     <div class="rail-inner">
       <div class="pv-frame sm" data-pv="sm"></div>
+      <div id="railStatus"></div>
+      <div class="rail-controls" id="railControls" role="group" aria-label="Живые настройки"></div>
       <div id="railBody"></div>
     </div>
   </aside>
