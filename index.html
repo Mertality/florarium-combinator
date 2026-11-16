@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0a1411">
+<meta name="theme-color" content="#FAF7F2">
 <title>Флорариум · Комбинатор</title>
 <link rel="icon" href="img/logo_florarium.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +16,7 @@
 <div class="bg" aria-hidden="true"><div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div><div class="grain"></div></div>
 
 <header class="nav" id="nav">
-  <a class="brand" href="#" data-view-link="builder"><img src="img/logo_florarium.svg" alt="" class="brand-logo"><span class="brand-name" data-i18n="app.title"></span></a>
+  <a class="brand" href="#" data-view-link="builder"><img src="img/logo_florarium.svg" alt="" class="brand-logo"><span class="brand-name" data-i18n="app.title">Флорариум</span></a>
   <nav class="nav-links" id="navLinks" aria-label="Разделы"></nav>
   <div class="nav-right"><button class="lang-switch" id="langBtn" type="button" aria-label="Language">RU</button></div>
 </header>
@@ -29,10 +29,13 @@
     <div class="builder-grid">
       <aside class="panel config" id="configPanel" aria-label="Параметры"></aside>
       <section class="panel catalog" aria-label="Каталог">
-        <div class="catalog-head"><div class="tabs" id="catalogTabs"></div>
+        <div class="catalog-head">
+          <div class="tabs" id="catalogTabs"></div>
           <div class="search inset"><svg viewBox="0 0 24 24" class="ic"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="searchInput" type="search" autocomplete="off"></div>
-          <select id="sortSelect" class="select" aria-label="Sort"></select></div>
-        <div class="chips" id="groupChips"></div><div class="cards" id="catalogCards"></div>
+          <select id="sortSelect" class="select" aria-label="Sort"></select>
+        </div>
+        <div class="chips" id="groupChips"></div>
+        <div class="cards" id="catalogCards"></div>
       </section>
       <aside class="panel jar" id="jarPanel" aria-label="Сборка"></aside>
     </div>
@@ -72,6 +75,6 @@
 })();
 </script>
 <script src="app.js"></script>
-<script src="preview.js" defer></script>
+<script src="preview.js"></script>
 </body>
 </html>
