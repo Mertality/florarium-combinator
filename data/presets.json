@@ -1,0 +1,121 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "file": "data/presets.json",
+    "purpose": "Готовые проверенные сборки. Один клик — полная композиция: тара, система, место, растения, живность, камни, субстрат.",
+    "locale": "name_ru / name_en / desc_ru / desc_en в карточке; остальное — машинные ключи",
+    "note": "items — slug'и из plants_fauna.json. Все сборки проверены по criteria 1.3."
+  },
+  "presets": [
+    {
+      "id": "preset_first_jar", "slug": "first-jar",
+      "name_ru": "Первая банка", "name_en": "First jar",
+      "desc_ru": "Классика закрытого флорариума: фиттония, подушка мха и коллемболы-санитары. Прощает ошибки новичка.",
+      "desc_en": "The closed-jar classic: fittonia, a moss cushion and springtail cleaners. Forgiving for a first try.",
+      "vessel": "vessel_jar_3l", "system": "closed", "placement": "east_west", "water": "soft", "experience": "beginner", "style": "tropical_jungle",
+      "flags": { "grow": false, "winter": false, "water": false },
+      "substrate": "tropical", "stones": ["ohko"], "decor": ["driftwood"],
+      "items": ["fittonia", "leucobryum", "collembola"],
+      "tags": ["start", "closed"]
+    },
+    {
+      "id": "preset_moss_forest", "slug": "moss-forest",
+      "name_ru": "Мшистый лес", "name_en": "Moss forest",
+      "desc_ru": "Три вида мхов на кислом субстрате и сланец. Северное окно, мягкая вода, минимум вмешательства.",
+      "desc_en": "Three mosses on acid substrate with slate. North window, soft water, minimal intervention.",
+      "vessel": "vessel_jar_3l", "system": "closed", "placement": "north", "water": "soft", "experience": "beginner", "style": "taiga_wabikusa",
+      "flags": { "grow": false, "winter": false, "water": false },
+      "substrate": "moss_acid", "stones": ["slate"], "decor": ["oak_litter"],
+      "items": ["leucobryum", "dicranum", "selaginella", "collembola"],
+      "tags": ["start", "closed", "moss"]
+    },
+    {
+      "id": "preset_succulent_bowl", "slug": "succulent-bowl",
+      "name_ru": "Суккулентная плошка", "name_en": "Succulent bowl",
+      "desc_ru": "Открытая плошка на солнечном подоконнике. Полив раз в 2–4 недели, полная просушка между поливами.",
+      "desc_en": "Open bowl on a sunny sill. Water every 2–4 weeks, full dry-out in between.",
+      "vessel": "vessel_bowl_small", "system": "open", "placement": "south_shaded", "water": "soft", "experience": "beginner", "style": "minimal_modern",
+      "flags": { "grow": true, "winter": false, "water": false },
+      "substrate": "succulent_mineral", "stones": ["granite"], "decor": [],
+      "items": ["haworthia", "gasteria", "sedum"],
+      "tags": ["start", "open", "dry"]
+    },
+    {
+      "id": "preset_jungle_5", "slug": "jungle-5",
+      "name_ru": "Джунгли в банке", "name_en": "Jar jungle",
+      "desc_ru": "Плотная зелень в два яруса: фиттония-акцент, ковёр из солейролии и мха, две команды санитаров.",
+      "desc_en": "Dense two-tier greenery: fittonia accent, soleirolia and moss carpet, two cleanup crews.",
+      "vessel": "vessel_jar_5l", "system": "closed", "placement": "east_west", "water": "soft", "experience": "beginner", "style": "tropical_jungle",
+      "flags": { "grow": false, "winter": false, "water": false },
+      "substrate": "tropical", "stones": ["ohko"], "decor": ["driftwood"],
+      "items": ["fittonia", "soleirolia", "leucobryum", "collembola", "trichorhina"],
+      "tags": ["closed", "lush"]
+    },
+    {
+      "id": "preset_iwagumi", "slug": "iwagumi",
+      "name_ru": "Ивагуми", "name_en": "Iwagumi",
+      "desc_ru": "Одна порода камня и сплошной ковёр. Камень — главный герой, растения только подчёркивают рельеф.",
+      "desc_en": "A single stone type and a solid carpet. The stone is the hero; plants only trace the relief.",
+      "vessel": "vessel_jar_5l", "system": "semi", "placement": "east_west", "water": "soft", "experience": "beginner", "style": "iwagumi_rocky",
+      "flags": { "grow": false, "winter": false, "water": false },
+      "substrate": "tropical", "stones": ["slate"], "decor": [],
+      "items": ["soleirolia", "leucobryum", "mnium", "collembola"],
+      "tags": ["semi", "stone"]
+    },
+    {
+      "id": "preset_taiga_fern", "slug": "taiga-fern",
+      "name_ru": "Тайга с папоротником", "name_en": "Taiga with fern",
+      "desc_ru": "Мшиные кочки, дубовый опад и асплениум на камне. Прохладный уголок с северным светом.",
+      "desc_en": "Moss mounds, oak litter and asplenium on stone. A cool corner with northern light.",
+      "vessel": "vessel_cube_10l", "system": "semi", "placement": "north", "water": "soft", "experience": "beginner", "style": "taiga_wabikusa",
+      "flags": { "grow": false, "winter": false, "water": false },
+      "substrate": "tropical", "stones": ["slate", "granite"], "decor": ["oak_litter", "driftwood"],
+      "items": ["leucobryum", "dicranum", "asplenium", "collembola"],
+      "tags": ["semi", "moss", "large"]
+    },
+    {
+      "id": "preset_bog", "slug": "bog",
+      "name_ru": "Болото с росянкой", "name_en": "Sundew bog",
+      "desc_ru": "Росянка на живом сфагнуме. Только дистиллированная вода и яркий свет — зато роса крупная.",
+      "desc_en": "Sundew on living sphagnum. Distilled water and bright light only — but the dew is generous.",
+      "vessel": "vessel_cube_10l", "system": "semi", "placement": "south_shaded", "water": "distilled", "experience": "experienced", "style": "forest_stream",
+      "flags": { "grow": true, "winter": false, "water": false },
+      "substrate": "carnivore_acid", "stones": ["quartz"], "decor": [],
+      "items": ["drosera", "sphagnum", "collembola"],
+      "tags": ["semi", "carnivore", "large"]
+    },
+    {
+      "id": "preset_ruins", "slug": "ruins",
+      "name_ru": "Руины", "name_en": "Ruins",
+      "desc_ru": "Кирпич и терракота, захваченные камнеломкой и мхом. Камни обязательно вымочить и проверить уксусом.",
+      "desc_en": "Brick and terracotta reclaimed by saxifrage and moss. Soak the stones and run the vinegar test first.",
+      "vessel": "vessel_cube_10l", "system": "semi", "placement": "east_west", "water": "soft", "experience": "beginner", "style": "ruins_postapo",
+      "flags": { "grow": false, "winter": false, "water": false },
+      "substrate": "tropical", "stones": ["brick", "terracotta"], "decor": ["aged_wood"],
+      "items": ["saxifraga", "leucobryum", "collembola"],
+      "tags": ["semi", "stone", "large"]
+    },
+    {
+      "id": "preset_air_minimal", "slug": "air-minimal",
+      "name_ru": "Воздушный минимализм", "name_en": "Air minimal",
+      "desc_ru": "Одна тилландсия на коряге в几何 домике. Без грунта: замачивание раз в 1–2 недели.",
+      "desc_en": "A single tillandsia on driftwood in a geometric house. No substrate: soak every 1–2 weeks.",
+      "vessel": "vessel_geo_house_7l", "system": "open", "placement": "east_west", "water": "soft", "experience": "beginner", "style": "minimal_modern",
+      "flags": { "grow": false, "winter": false, "water": false },
+      "substrate": "epiphytic", "stones": ["quartz"], "decor": ["driftwood"],
+      "items": ["tillandsia"],
+      "tags": ["open", "dry", "start"]
+    },
+    {
+      "id": "preset_nepenthes", "slug": "nepenthes",
+      "name_ru": "Кувшинчатый уголок", "name_en": "Pitcher corner",
+      "desc_ru": "Карликовый непентес на коряге. Нужен перепад день/ночь и дистиллят — сборка для опытных.",
+      "desc_en": "A dwarf nepenthes on driftwood. Needs a day/night drop and distilled water — for experienced keepers.",
+      "vessel": "vessel_jar_5l", "system": "semi", "placement": "east_west", "water": "distilled", "experience": "experienced", "style": "tropical_jungle",
+      "flags": { "grow": true, "winter": false, "water": false },
+      "substrate": "epiphytic", "stones": ["quartz"], "decor": ["driftwood"],
+      "items": ["nepenthes", "collembola"],
+      "tags": ["semi", "carnivore", "expert"]
+    }
+  ]
+}
