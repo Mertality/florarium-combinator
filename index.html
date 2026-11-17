@@ -14,19 +14,20 @@
 <body data-tab="build">
 <div class="bg" aria-hidden="true"><span class="aurora a1"></span><span class="aurora a2"></span><span class="aurora a3"></span><span class="veins"></span></div>
 
-<header class="topbar">
-  <a class="brand" href="#" data-go="build">
-    <img src="img/logo_florarium.svg" alt="" class="brand-logo">
-    <span class="brand-text"><b data-i18n="app.title">Флорариум</b><i data-i18n="app.tagline">Собери экосистему, которая выживет</i></span>
-  </a>
-  <nav class="tabnav" id="tabnav" aria-label="Разделы"></nav>
-  <div class="topbar-tools">
-    <button class="tool" id="themeBtn" type="button" aria-label="Тема"></button>
-    <button class="tool lang" id="langBtn" type="button" aria-label="Language">RU</button>
-  </div>
-</header>
-
-<div class="dock" id="dock" role="group" aria-label="Живые настройки"></div>
+<div class="head" id="head">
+  <header class="topbar">
+    <a class="brand" href="#" data-go="build" title="Флорариум">
+      <img src="img/logo_florarium.svg" alt="" class="brand-logo">
+      <span class="brand-text"><b data-i18n="app.title">Флорариум</b><i data-i18n="app.tagline">Собери экосистему, которая выживет</i></span>
+    </a>
+    <nav class="tabnav" id="tabnav" aria-label="Разделы"></nav>
+    <div class="topbar-tools">
+      <button class="tool" id="themeBtn" type="button" aria-label="Тема"></button>
+      <button class="tool lang" id="langBtn" type="button" aria-label="Language">RU</button>
+    </div>
+  </header>
+  <div class="dock" id="dock" role="group" aria-label="Живые настройки"></div>
+</div>
 
 <main class="shell" id="shell">
   <div class="workspace">
@@ -47,13 +48,9 @@
     </section>
     <section class="boot hidden" id="bootError"><span class="err-dot"></span><h2>Не удалось запустить</h2><p id="bootErrorMsg"></p><button class="btn primary" id="retryBtn" type="button">Повторить</button></section>
 
-    <section class="pane hidden" id="pane-build">
-      <div class="build-top">
-        <div class="pv-card"><div class="pv-frame" data-pv="lg"></div><div class="pv-meta" id="pvMeta"></div></div>
-        <div class="verdict-card" id="verdictCard"></div>
-      </div>
-      <div class="subtabs" id="buildSubtabs" role="tablist"></div>
-      <div class="pane-body" id="buildBody"></div>
+    <section class="pane hidden" id="pane-setup">
+      <div class="pane-head"><h1 data-i18n="tab.setup">Условия</h1><p class="sub" data-i18n="setup.hint">Тара, система, место и материалы</p></div>
+      <div class="setup-grid" id="setupBody"></div>
     </section>
 
     <section class="pane hidden" id="pane-plants">
@@ -70,9 +67,13 @@
       <div class="grid" id="faunaGrid"></div>
     </section>
 
-    <section class="pane hidden" id="pane-setup">
-      <div class="pane-head"><h1 data-i18n="tab.setup">Условия</h1><p class="sub" data-i18n="setup.hint">Тара, система, место и материалы</p></div>
-      <div class="setup-grid" id="setupBody"></div>
+    <section class="pane hidden" id="pane-build">
+      <div class="build-top">
+        <div class="pv-card"><div class="pv-frame" data-pv="lg"></div><div class="pv-meta" id="pvMeta"></div></div>
+        <div class="verdict-card" id="verdictCard"></div>
+      </div>
+      <div class="subtabs" id="buildSubtabs" role="tablist"></div>
+      <div class="pane-body" id="buildBody"></div>
     </section>
 
     <section class="pane hidden" id="pane-care">
@@ -125,6 +126,11 @@
   window.addEventListener('error',function(ev){if(!window.__florReady)window.__florFail('Ошибка JS: '+(ev.message||'?')+' ('+(ev.filename||'').split('/').pop()+':'+(ev.lineno||'?')+'). Консоль: F12.');});
   setTimeout(function(){if(!window.__florReady)window.__florFail('app.js не запустился. Скопируйте файл целиком — последняя строка boot(); — и обновите страницу (Ctrl+F5).');},9000);
   document.addEventListener('click',function(e){if(e.target&&e.target.id==='retryBtn')location.reload();});
+  function head(){var h=document.getElementById('head');if(h)document.documentElement.style.setProperty('--head-h',h.offsetHeight+'px');}
+  window.__measureHead=head;
+  addEventListener('load',head);addEventListener('resize',head);addEventListener('orientationchange',function(){setTimeout(head,220);});
+  if(window.ResizeObserver){new ResizeObserver(head).observe(document.getElementById('head'));}
+  head();
 })();
 </script>
 <script src="app.js"></script>
